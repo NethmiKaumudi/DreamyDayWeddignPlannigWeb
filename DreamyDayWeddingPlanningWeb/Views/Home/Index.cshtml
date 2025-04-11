@@ -1,0 +1,62 @@
+﻿@{
+    ViewData["Title"] = "DreamyDay | Home";
+}
+
+<style>
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(to bottom right, #4A90E2, #ffffff);
+        color: #333;
+    }
+
+    .hero-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 6rem 2rem;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 16px;
+        margin: 3rem auto;
+        max-width: 80%;
+        height:70vh;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .hero-section h1 {
+        font-size: 3rem;
+        color: #2A5298;
+        margin-bottom: 1rem;
+    }
+
+    .hero-section p {
+        font-size: 1.2rem;
+        color: #555;
+        margin-bottom: 2rem;
+    }
+
+    .hero-section a {
+        display: inline-block;
+        background-color: #2A5298;
+        color: #fff;
+        padding: 0.75rem 1.5rem;
+        text-decoration: none;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+    }
+
+    .hero-section a:hover {
+        background-color: #1A3C78;
+    }
+
+</style>
+
+<div class="hero-section" style="background-image: url('/images/weddingbg.jpg'); background-size: cover; background-position: center; padding: 100px 20px; color: black; text-align: center;">
+    <h1 style="font-size: 3rem; font-weight: bold; color: black;">Welcome to DreamyDay</h1>
+    <p style="font-size: 1.25rem; margin: 20px 0; color: white;">Your one-stop solution to plan the perfect wedding — elegant, effortless, and unforgettable.</p>
+    <a href="/Identity/Account/Login" style="background-color: white; color: #003B73; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; border: 2px solid #003B73;">Get Started</a>
+</div>
+
