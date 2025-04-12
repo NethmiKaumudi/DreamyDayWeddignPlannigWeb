@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using DreamyDayWeddingPlanningWeb.Areas.Identity.Data;
+using System.ComponentModel.DataAnnotations;
 
 namespace DreamyDayWeddingPlanningWeb.Models
 {
@@ -16,5 +17,8 @@ namespace DreamyDayWeddingPlanningWeb.Models
         public bool IsCompleted { get; set; }
 
         public string UserId { get; set; }
+        public ApplicationUser User { get; set; }
+        public bool IsDeleted { get; set; } = false;
+
     }
 }
