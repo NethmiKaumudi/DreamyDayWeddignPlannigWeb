@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DreamyDayWeddingPlanningWeb")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+63ad0069b7b4cf32eb4723c4817cb0d0a3bc5278")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4ee729a65d5d3fff763714ab24eefb44b95f0346")]
 [assembly: System.Reflection.AssemblyProductAttribute("DreamyDayWeddingPlanningWeb")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DreamyDayWeddingPlanningWeb")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
