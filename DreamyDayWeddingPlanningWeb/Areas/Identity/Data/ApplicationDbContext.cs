@@ -1,4 +1,5 @@
 ﻿using DreamyDayWeddingPlanningWeb.Areas.Identity.Data;
+using DreamyDayWeddingPlanningWeb.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         : base(options)
     {
     }
+    public DbSet<WeddingTask> WeddingTasks { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
