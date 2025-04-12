@@ -9,7 +9,7 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
     {
         public IActionResult Dashboard()
         {
-            return View();
+            return View("Dashboard","Couple");
         }
 
         public IActionResult Overview()
