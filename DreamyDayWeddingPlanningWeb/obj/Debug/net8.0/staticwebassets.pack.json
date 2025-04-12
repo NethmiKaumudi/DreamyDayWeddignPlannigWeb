@@ -13,6 +13,10 @@
       "PackagePath": "staticwebassets\\favicon.ico"
     },
     {
+      "Id": "D:\\ESOFT TOP UP\\PD\\DreamyDayWeddingPlanningWeb\\DreamyDayWeddingPlanningWeb\\wwwroot\\images\\weddingbg.jpg",
+      "PackagePath": "staticwebassets\\images\\weddingbg.jpg"
+    },
+    {
       "Id": "D:\\ESOFT TOP UP\\PD\\DreamyDayWeddingPlanningWeb\\DreamyDayWeddingPlanningWeb\\wwwroot\\js\\site.js",
       "PackagePath": "staticwebassets\\js\\site.js"
     },

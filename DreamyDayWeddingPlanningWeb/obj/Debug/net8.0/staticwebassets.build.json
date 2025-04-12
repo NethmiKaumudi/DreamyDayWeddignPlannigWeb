@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "aFNxXtKBgCyqaVL8STdgN5bY/FCgYL3M5a4T9AN0Okc=",
+  "Hash": "hIC4/ZMA/+/tPfDEgI9IgQkrMwdcUKS1d+gDFd3v5zY=",
   "Source": "DreamyDayWeddingPlanningWeb",
   "BasePath": "_content/DreamyDayWeddingPlanningWeb",
   "Mode": "Default",
@@ -1231,6 +1231,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\favicon.ico"
+    },
+    {
+      "Identity": "D:\\ESOFT TOP UP\\PD\\DreamyDayWeddingPlanningWeb\\DreamyDayWeddingPlanningWeb\\wwwroot\\images\\weddingbg.jpg",
+      "SourceId": "DreamyDayWeddingPlanningWeb",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\ESOFT TOP UP\\PD\\DreamyDayWeddingPlanningWeb\\DreamyDayWeddingPlanningWeb\\wwwroot\\",
+      "BasePath": "_content/DreamyDayWeddingPlanningWeb",
+      "RelativePath": "images/weddingbg.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\weddingbg.jpg"
     },
     {
       "Identity": "D:\\ESOFT TOP UP\\PD\\DreamyDayWeddingPlanningWeb\\DreamyDayWeddingPlanningWeb\\wwwroot\\js\\site.js",
