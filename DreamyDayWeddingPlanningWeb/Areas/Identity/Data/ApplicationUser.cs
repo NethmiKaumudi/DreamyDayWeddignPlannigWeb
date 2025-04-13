@@ -10,5 +10,6 @@ namespace DreamyDayWeddingPlanningWeb.Areas.Identity.Data;
 public class ApplicationUser : IdentityUser
 {
     public string? Role { get; set; }
+    public string? ContactNumber { get; set; }
 }
 

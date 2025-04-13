@@ -29,7 +29,9 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
 
         public IActionResult GuestList()
         {
+            //return RedirectToAction("Index", "Guests");
             return View();
+
         }
 
         public IActionResult Budget()

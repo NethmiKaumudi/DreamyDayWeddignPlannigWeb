@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using DreamyDayWeddingPlanningWeb.Areas.Identity.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Identity.UI.Services; // Add for IEmailSender
-using System.Text.Encodings.Web; // Add for HtmlEncoder
+using DreamyDayWeddingPlanningWeb.Areas.Identity.Data;
 
 namespace DreamyDayWeddingPlanningWeb.Areas.Identity.Pages.Account
 {
@@ -22,14 +22,14 @@ namespace DreamyDayWeddingPlanningWeb.Areas.Identity.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUserStore<ApplicationUser> _userStore;
         private readonly ILogger<RegisterModel> _logger;
-        private readonly IEmailSender _emailSender; // Add IEmailSender
+        private readonly IEmailSender _emailSender;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender) // Inject IEmailSender
+            IEmailSender emailSender)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -70,6 +70,11 @@ namespace DreamyDayWeddingPlanningWeb.Areas.Identity.Pages.Account
             [Required]
             [Display(Name = "Role")]
             public string Role { get; set; }
+
+            [Required]
+            [Display(Name = "Contact Number")]
+            [Phone(ErrorMessage = "Invalid phone number.")]
+            public string ContactNumber { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -86,11 +91,10 @@ namespace DreamyDayWeddingPlanningWeb.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
 
-                // Set the username and email
+                // Set the username, email, and contact number
                 await _userStore.SetUserNameAsync(user, Input.Username, CancellationToken.None);
                 await GetEmailStore().SetEmailAsync(user, Input.Email, CancellationToken.None);
-
-                // Set the custom Role property (from ApplicationUser)
+                user.ContactNumber = Input.ContactNumber;
                 user.Role = Input.Role;
 
                 // Create the user with the provided password

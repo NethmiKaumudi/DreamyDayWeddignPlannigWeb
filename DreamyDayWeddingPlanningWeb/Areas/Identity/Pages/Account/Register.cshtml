@@ -208,7 +208,11 @@
     <input asp-for="Input.Email" class="form-control" autocomplete="email" aria-required="true" />
     <span asp-validation-for="Input.Email" class="text-danger"></span>
 </div>
-
+                <div class="form-group">
+                    <label asp-for="Input.ContactNumber">Contact Number</label>
+                    <input asp-for="Input.ContactNumber" class="form-control" autocomplete="tel" aria-required="true" />
+                    <span asp-validation-for="Input.ContactNumber" class="text-danger"></span>
+                </div>
                 <!-- Password Field with Show/Hide -->
                 <div class="form-group position-relative">
                     <label asp-for="Input.Password">Password</label>

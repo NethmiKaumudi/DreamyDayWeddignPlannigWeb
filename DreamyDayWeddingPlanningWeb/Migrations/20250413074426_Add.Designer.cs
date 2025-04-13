@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DreamyDayWeddingPlanningWeb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250412142557_Add")]
+    [Migration("20250413074426_Add")]
     partial class Add
     {
         /// <inheritdoc />
@@ -35,6 +35,9 @@ namespace DreamyDayWeddingPlanningWeb.Migrations
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ContactNumber")
                         .HasColumnType("longtext");
 
                     b.Property<string>("Email")
@@ -196,78 +199,6 @@ namespace DreamyDayWeddingPlanningWeb.Migrations
                     b.HasIndex("WeddingId");
 
                     b.ToTable("Guests");
-                });
-
-            modelBuilder.Entity("DreamyDayWeddingPlanningWeb.Models.Message", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("varchar(1000)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("ReceiverId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("SenderId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<DateTime>("SentAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReceiverId");
-
-                    b.HasIndex("SenderId");
-
-                    b.ToTable("Messages");
-                });
-
-            modelBuilder.Entity("DreamyDayWeddingPlanningWeb.Models.Notification", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("DreamyDayWeddingPlanningWeb.Models.TimelineEvent", b =>
@@ -596,36 +527,6 @@ namespace DreamyDayWeddingPlanningWeb.Migrations
                         .IsRequired();
 
                     b.Navigation("Wedding");
-                });
-
-            modelBuilder.Entity("DreamyDayWeddingPlanningWeb.Models.Message", b =>
-                {
-                    b.HasOne("DreamyDayWeddingPlanningWeb.Areas.Identity.Data.ApplicationUser", "Receiver")
-                        .WithMany()
-                        .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DreamyDayWeddingPlanningWeb.Areas.Identity.Data.ApplicationUser", "Sender")
-                        .WithMany()
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Receiver");
-
-                    b.Navigation("Sender");
-                });
-
-            modelBuilder.Entity("DreamyDayWeddingPlanningWeb.Models.Notification", b =>
-                {
-                    b.HasOne("DreamyDayWeddingPlanningWeb.Areas.Identity.Data.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DreamyDayWeddingPlanningWeb.Models.TimelineEvent", b =>
