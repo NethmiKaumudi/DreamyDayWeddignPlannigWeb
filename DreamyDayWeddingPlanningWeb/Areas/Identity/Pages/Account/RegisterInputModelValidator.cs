@@ -31,8 +31,9 @@ namespace DreamyDayWeddingPlanningWeb.Areas.Identity.Pages.Account
                 .WithMessage("Role must be one of: Couple, Planner, or Admin.");
 
             RuleFor(x => x.ContactNumber)
-                .NotEmpty().WithMessage("Contact number is required.")
-                .Matches(@"^\+?[1-9]\d{1,14}$").WithMessage("Invalid phone number format.");
+      .NotEmpty().WithMessage("Contact number is required.")
+      .Matches(@"^0\d{9}$").WithMessage("Invalid phone number format.");
+
         }
     }
 }

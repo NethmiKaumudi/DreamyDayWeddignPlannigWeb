@@ -1,21 +1,27 @@
-﻿@* Views/Shared/_CoupleLayout.cshtml *@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - DreamyDay Wedding Planning</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             font-family: Arial, sans-serif;
             background: linear-gradient(to bottom, #A3BFFA, #E2E8F0);
+            height: 100vh;
+            overflow: hidden;
         }
 
         .navbar {
             background-color: #fff;
-            padding: 15px 20px;
+            padding: 10px 15px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             display: flex;
             justify-content: space-between;
@@ -52,14 +58,18 @@
 
         .container {
             display: flex;
-            min-height: calc(100vh - 120px);
+            height: calc(100vh - 60px);
+            padding: 0;
+            margin: 0;
         }
 
         .sidebar {
-            width: 200px;
+            width: 250px;
             background-color: #fff;
             padding: 20px;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            height: 100%;
+            overflow-y: auto;
         }
 
         .sidebar-title {
@@ -74,37 +84,46 @@
         }
 
             .sidebar-nav li {
-                margin-bottom: 10px;
+                margin-bottom: 30px;
             }
 
-            .sidebar-nav a {
-                color: #007bff;
-                text-decoration: none;
-                font-size: 16px;
-                display: flex;
-                align-items: center;
+        .sidebar-btn {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            white-space: nowrap;
+        }
+
+            .sidebar-btn i {
+                margin-right: 10px;
             }
 
-                .sidebar-nav a i {
-                    margin-right: 10px;
-                    color: #007bff;
-                }
-
-                .sidebar-nav a:hover {
-                    text-decoration: underline;
-                }
+            .sidebar-btn:hover {
+                background-color: #0056b3;
+            }
 
         .content {
             flex: 1;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
+            padding: 0;
+            overflow-y: auto;
+            max-width: calc(100% - 250px); /* Sidebar is 250px wide */
+            height: 100%;
         }
 
         footer {
             text-align: center;
-            padding: 10px;
+            padding: 5px;
             color: #666;
+            background-color: #fff;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
         }
     </style>
 </head>
@@ -121,18 +140,43 @@
 
     <div class="container">
         <aside class="sidebar">
-            <h3 class="sidebar-title">Couple Menu</h3>
+            <h3 class="sidebar-title">Couple Dashboard</h3>
             <ul class="sidebar-nav">
-                <li><a asp-controller="Couple" asp-action="Dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                <li><a asp-controller="Couple" asp-action="Overview"><i class="fas fa-chart-pie"></i> Wedding Overview</a></li>
-                <li><a asp-controller="Couple" asp-action="Checklist"><i class="fas fa-check-square"></i> Wedding Tasks List</a></li>
-                <li><a asp-controller="Couple" asp-action="GuestList"><i class="fas fa-users"></i> Guest List</a></li>
-                <li><a asp-controller="Couple" asp-action="Budget"><i class="fas fa-wallet"></i> Budget Tracker</a></li>
-                <li><a asp-controller="Couple" asp-action="Timeline"><i class="fas fa-calendar-alt"></i> Timeline</a></li>
-                <li><a asp-controller="Couple" asp-action="Vendors"><i class="fas fa-store"></i> Vendor Catalog</a></li>
-                <li><a asp-controller="Couple" asp-action="Notifications"><i class="fas fa-bell"></i> Notifications</a></li>
-                <li><a asp-controller="Couple" asp-action="PlannerCommunication"><i class="fas fa-comments"></i> Chat with Planner</a></li>
-                <li><a asp-controller="Couple" asp-action="Profile"><i class="fas fa-user"></i> Profile Settings</a></li>
+                <li>
+                    <a asp-controller="Couple" asp-action="Dashboard" class="sidebar-btn">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Couple" asp-action="Checklist" class="sidebar-btn">
+                        <i class="fas fa-check-square"></i> Wedding Tasks List
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Couple" asp-action="GuestList" class="sidebar-btn">
+                        <i class="fas fa-users"></i> Guest List
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Couple" asp-action="Budget" class="sidebar-btn">
+                        <i class="fas fa-wallet"></i> Budget Tracker
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Couple" asp-action="Timeline" class="sidebar-btn">
+                        <i class="fas fa-calendar-alt"></i> Timeline
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Couple" asp-action="Vendors" class="sidebar-btn">
+                        <i class="fas fa-store"></i> Vendor Catalog
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Couple" asp-action="Profile" class="sidebar-btn">
+                        <i class="fas fa-user"></i> Profile Settings
+                    </a>
+                </li>
             </ul>
         </aside>
 

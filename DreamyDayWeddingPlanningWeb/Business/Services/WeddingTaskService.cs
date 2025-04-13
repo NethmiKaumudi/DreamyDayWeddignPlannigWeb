@@ -125,16 +125,17 @@ namespace DreamyDayWeddingPlanningWeb.Services
                 if (task == null)
                     throw new KeyNotFoundException($"Task with ID {id} not found for the user.");
 
-                _context.WeddingTasks.Remove(task);
+                task.IsDeleted = true; // Soft delete by setting IsDeleted to true
+                _context.WeddingTasks.Update(task);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException ex)
             {
-                throw new Exception("An error occurred while deleting the task.", ex);
+                throw new Exception("An error occurred while soft-deleting the task.", ex);
             }
             catch (Exception ex)
             {
-                throw new Exception($"An unexpected error occurred while deleting task with ID {id}.", ex);
+                throw new Exception($"An unexpected error occurred while soft-deleting task with ID {id}.", ex);
             }
         }
     }

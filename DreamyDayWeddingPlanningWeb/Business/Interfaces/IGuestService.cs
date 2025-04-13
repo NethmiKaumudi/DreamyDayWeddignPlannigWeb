@@ -8,6 +8,6 @@ namespace DreamyDayWeddingPlanningWeb.Business.Interfaces
         Task<Guest> GetGuestByIdAsync(int id, string userId);
         Task CreateGuestAsync(Guest guest);
         Task UpdateGuestAsync(Guest guest);
-        Task SoftDeleteGuestAsync(int id, string userId);
+        Task DeleteGuestAsync(int id, string userId);
     }
 }

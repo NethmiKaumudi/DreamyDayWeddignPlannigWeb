@@ -1,0 +1,111 @@
+﻿@model DreamyDayWeddingPlanningWeb.Models.Budget
+
+@{
+    ViewData["Title"] = "Edit Budget Item";
+    Layout = "~/Views/Shared/_CoupleLayout.cshtml";
+}
+
+<h1 style="font-size: 24px; margin-bottom: 20px;">Edit Budget Item</h1>
+
+<div class="container-fluid">
+    <div class="card">
+        <form asp-action="Edit" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="WeddingId" />
+            <div class="mb-3">
+                <label asp-for="Category" class="form-label"></label>
+                <select asp-for="Category" class="form-control" asp-items="@(new SelectList(ViewBag.Categories))">
+                    <option value="">Select a category</option>
+                </select>
+                <span asp-validation-for="Category" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="AllocatedAmount" class="form-label"></label>
+                <input asp-for="AllocatedAmount" class="form-control" step="0.01" />
+                <span asp-validation-for="AllocatedAmount" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="SpentAmount" class="form-label"></label>
+                <input asp-for="SpentAmount" class="form-control" step="0.01" />
+                <span asp-validation-for="SpentAmount" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .container-fluid {
+        max-width: 100%;
+        height: calc(100vh - 120px);
+        overflow-y: auto;
+        padding: 15px;
+    }
+
+    .card {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-label {
+        font-weight: bold;
+        color: #333;
+        font-size: 14px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 6px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .mb-3 {
+        margin-bottom: 10px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        padding: 6px 12px;
+        color: #fff;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border: none;
+        padding: 6px 12px;
+        color: #fff;
+        border-radius: 5px;
+        margin-left: 10px;
+        font-size: 14px;
+    }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+    .text-danger {
+        font-size: 0.9em;
+    }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -58,8 +58,52 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/ESOFT TOP UP/PD/DreamyDayWeddingPlanningWeb/DreamyDayWeddingPlanningWeb/Views/Budgets/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnVkZ2V0c1xDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ESOFT TOP UP/PD/DreamyDayWeddingPlanningWeb/DreamyDayWeddingPlanningWeb/Views/Budgets/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnVkZ2V0c1xEZWxldGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ESOFT TOP UP/PD/DreamyDayWeddingPlanningWeb/DreamyDayWeddingPlanningWeb/Views/Budgets/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnVkZ2V0c1xEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ESOFT TOP UP/PD/DreamyDayWeddingPlanningWeb/DreamyDayWeddingPlanningWeb/Views/Budgets/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnVkZ2V0c1xFZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ESOFT TOP UP/PD/DreamyDayWeddingPlanningWeb/DreamyDayWeddingPlanningWeb/Views/Budgets/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnVkZ2V0c1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/ESOFT TOP UP/PD/DreamyDayWeddingPlanningWeb/DreamyDayWeddingPlanningWeb/Views/Couple/Dashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ291cGxlXERhc2hib2FyZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ESOFT TOP UP/PD/DreamyDayWeddingPlanningWeb/DreamyDayWeddingPlanningWeb/Views/Couple/EditWedding.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ291cGxlXEVkaXRXZWRkaW5nLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ESOFT TOP UP/PD/DreamyDayWeddingPlanningWeb/DreamyDayWeddingPlanningWeb/Views/Guests/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3Vlc3RzXENyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ESOFT TOP UP/PD/DreamyDayWeddingPlanningWeb/DreamyDayWeddingPlanningWeb/Views/Guests/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3Vlc3RzXERlbGV0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ESOFT TOP UP/PD/DreamyDayWeddingPlanningWeb/DreamyDayWeddingPlanningWeb/Views/Guests/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3Vlc3RzXERldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ESOFT TOP UP/PD/DreamyDayWeddingPlanningWeb/DreamyDayWeddingPlanningWeb/Views/Guests/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3Vlc3RzXEVkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ESOFT TOP UP/PD/DreamyDayWeddingPlanningWeb/DreamyDayWeddingPlanningWeb/Views/Guests/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3Vlc3RzXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/ESOFT TOP UP/PD/DreamyDayWeddingPlanningWeb/DreamyDayWeddingPlanningWeb/Views/Home/Index.cshtml]

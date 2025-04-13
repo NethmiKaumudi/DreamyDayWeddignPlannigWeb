@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DreamyDayWeddingPlanningWeb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250413074426_Add")]
+    [Migration("20250413212019_Add")]
     partial class Add
     {
         /// <inheritdoc />
@@ -275,12 +275,7 @@ namespace DreamyDayWeddingPlanningWeb.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
-                    b.Property<int?>("WeddingId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("WeddingId");
 
                     b.ToTable("Vendors");
                 });
@@ -536,15 +531,6 @@ namespace DreamyDayWeddingPlanningWeb.Migrations
                         .HasForeignKey("WeddingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Wedding");
-                });
-
-            modelBuilder.Entity("DreamyDayWeddingPlanningWeb.Models.Vendor", b =>
-                {
-                    b.HasOne("DreamyDayWeddingPlanningWeb.Models.Wedding", "Wedding")
-                        .WithMany()
-                        .HasForeignKey("WeddingId");
 
                     b.Navigation("Wedding");
                 });

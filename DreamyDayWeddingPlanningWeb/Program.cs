@@ -36,7 +36,10 @@ builder.Services.AddValidatorsFromAssemblyContaining<VendorValidator>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IWeddingTaskService, WeddingTaskService>();
+builder.Services.AddScoped<IWeddingService, WeddingService>();
 builder.Services.AddScoped<IGuestService, GuestService>();
+builder.Services.AddScoped<IBudgetService, BudgetService>();
+
 
 
 
