@@ -2,6 +2,10 @@
 using DreamyDayWeddingPlanningWeb.Data;
 using DreamyDayWeddingPlanningWeb.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace DreamyDayWeddingPlanningWeb.Business.Services
 {
@@ -16,150 +20,80 @@ namespace DreamyDayWeddingPlanningWeb.Business.Services
 
         public async Task<List<Guest>> GetGuestsByUserIdAsync(string userId)
         {
-            try
-            {
-                if (string.IsNullOrEmpty(userId))
-                    throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
-
-                // Find the user's wedding
-                var wedding = await _context.Weddings
-                    .FirstOrDefaultAsync(w => w.UserId == userId && !w.IsDeleted);
-
-                if (wedding == null)
-                    return new List<Guest>();
-
-                return await _context.Guests
-                    .Include(g => g.Wedding)
-                    .Where(g => g.WeddingId == wedding.Id && !g.IsDeleted)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while retrieving guests.", ex);
-            }
+            return await _context.Guests
+                .Join(
+                    _context.Weddings.Where(w => w.UserId == userId),
+                    guest => guest.WeddingId,
+                    wedding => wedding.Id,
+                    (guest, wedding) => guest
+                )
+                .Where(g => !g.IsDeleted)
+                .ToListAsync();
         }
 
         public async Task<Guest> GetGuestByIdAsync(int id, string userId)
         {
-            try
+            var guest = await _context.Guests
+                .Join(
+                    _context.Weddings.Where(w => w.UserId == userId),
+                    guest => guest.WeddingId,
+                    wedding => wedding.Id,
+                    (guest, wedding) => guest
+                )
+                .Where(g => g.Id == id && !g.IsDeleted)
+                .FirstOrDefaultAsync();
+
+            if (guest == null)
             {
-                if (id <= 0)
-                    throw new ArgumentException("Invalid guest ID.", nameof(id));
-                if (string.IsNullOrEmpty(userId))
-                    throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
-
-                // Find the user's wedding
-                var wedding = await _context.Weddings
-                    .FirstOrDefaultAsync(w => w.UserId == userId && !w.IsDeleted);
-
-                if (wedding == null)
-                    throw new KeyNotFoundException("No wedding found for the user.");
-
-                var guest = await _context.Guests
-                    .Include(g => g.Wedding)
-                    .FirstOrDefaultAsync(g => g.Id == id && g.WeddingId == wedding.Id && !g.IsDeleted);
-
-                if (guest == null)
-                    throw new KeyNotFoundException($"Guest with ID {id} not found for the user.");
-
-                return guest;
+                throw new KeyNotFoundException("Guest not found or you do not have access to this guest.");
             }
-            catch (Exception ex)
-            {
-                throw new Exception($"An error occurred while retrieving guest with ID {id}.", ex);
-            }
+
+            return guest;
         }
 
         public async Task CreateGuestAsync(Guest guest)
         {
-            try
-            {
-                if (guest == null)
-                    throw new ArgumentNullException(nameof(guest), "Guest cannot be null.");
-
-                _context.Guests.Add(guest);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException ex)
-            {
-                throw new Exception("An error occurred while creating the guest. Please check the data and try again.", ex);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An unexpected error occurred while creating the guest.", ex);
-            }
+            guest.IsDeleted = false;
+            _context.Guests.Add(guest);
+            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateGuestAsync(Guest guest)
         {
-            try
-            {
-                if (guest == null)
-                    throw new ArgumentNullException(nameof(guest), "Guest cannot be null.");
+            // Fetch the Wedding record to get the UserId
+            var wedding = await _context.Weddings
+                .Where(w => w.Id == guest.WeddingId)
+                .FirstOrDefaultAsync();
 
-                var existingGuest = await _context.Guests.FindAsync(guest.Id);
-                if (existingGuest == null)
-                    throw new KeyNotFoundException($"Guest with ID {guest.Id} not found.");
+            if (wedding == null)
+            {
+                throw new KeyNotFoundException("Wedding not found for the given WeddingId.");
+            }
 
-                // Update properties
-                existingGuest.Name = guest.Name;
-                existingGuest.HasRSVPed = guest.HasRSVPed;
-                existingGuest.MealPreference = guest.MealPreference;
-                existingGuest.SeatingArrangement = guest.SeatingArrangement;
-                // WeddingId should not be updated by the user
-                // IsDeleted should not be updated directly
+            // Fetch the guest with its Wedding navigation property
+            var existingGuest = await _context.Guests
+                .Where(g => g.Id == guest.Id && !g.IsDeleted)
+                .Include(g => g.Wedding)
+                .FirstOrDefaultAsync();
 
-                _context.Guests.Update(existingGuest);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException ex)
+            if (existingGuest == null || existingGuest.Wedding == null || existingGuest.Wedding.UserId != wedding.UserId)
             {
-                throw new Exception("The guest was modified by another user. Please refresh and try again.", ex);
+                throw new KeyNotFoundException("Guest not found or you do not have access to this guest.");
             }
-            catch (DbUpdateException ex)
-            {
-                throw new Exception("An error occurred while updating the guest. Please check the data and try again.", ex);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An unexpected error occurred while updating the guest.", ex);
-            }
+
+            existingGuest.Name = guest.Name;
+            existingGuest.HasRSVPed = guest.HasRSVPed;
+            existingGuest.MealPreference = guest.MealPreference;
+            existingGuest.SeatingArrangement = guest.SeatingArrangement;
+            existingGuest.WeddingId = guest.WeddingId;
+            await _context.SaveChangesAsync();
         }
 
-        public async Task SoftDeleteGuestAsync(int id, string userId)
+        public async Task DeleteGuestAsync(int id, string userId)
         {
-            try
-            {
-                if (id <= 0)
-                    throw new ArgumentException("Invalid guest ID.", nameof(id));
-                if (string.IsNullOrEmpty(userId))
-                    throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
-
-                // Find the user's wedding
-                var wedding = await _context.Weddings
-                    .FirstOrDefaultAsync(w => w.UserId == userId && !w.IsDeleted);
-
-                if (wedding == null)
-                    throw new KeyNotFoundException("No wedding found for the user.");
-
-                var guest = await _context.Guests
-                    .FirstOrDefaultAsync(g => g.Id == id && g.WeddingId == wedding.Id && !g.IsDeleted);
-
-                if (guest == null)
-                    throw new KeyNotFoundException($"Guest with ID {id} not found for the user.");
-
-                guest.IsDeleted = true;
-                _context.Guests.Update(guest);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException ex)
-            {
-                throw new Exception("An error occurred while deleting the guest.", ex);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"An unexpected error occurred while deleting guest with ID {id}.", ex);
-            }
+            var guest = await GetGuestByIdAsync(id, userId);
+            guest.IsDeleted = true; // Soft delete
+            await _context.SaveChangesAsync();
         }
     }
 }

@@ -198,7 +198,7 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
             {
                 var userId = _userManager.GetUserId(User);
                 await _weddingTaskService.DeleteTaskAsync(id, userId);
-                TempData["SuccessMessage"] = "Task deleted successfully.";
+                TempData["SuccessMessage"] = "Task soft-deleted successfully.";
                 return RedirectToAction(nameof(Index));
             }
             catch (KeyNotFoundException ex)
@@ -210,6 +210,30 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
             {
                 TempData["ErrorMessage"] = ex.Message;
                 return RedirectToAction("Error", "Home");
+            }
+        }
+
+        // POST: WeddingTasks/Complete/5
+        [HttpPost]
+        public async Task<IActionResult> Complete(int id)
+        {
+            try
+            {
+                var userId = _userManager.GetUserId(User);
+                var task = await _weddingTaskService.GetTaskByIdAsync(id, userId);
+                if (task == null)
+                {
+                    return NotFound();
+                }
+
+                task.IsCompleted = true;
+                await _weddingTaskService.UpdateTaskAsync(task);
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
             }
         }
     }
