@@ -15,12 +15,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     }
     public DbSet<WeddingTask> WeddingTasks { get; set; }
     public DbSet<Wedding> Weddings { get; set; }
-    public DbSet<Notification> Notifications { get; set; }
     public DbSet<Guest> Guests { get; set; }
     public DbSet<Budget> Budgets { get; set; }
     public DbSet<TimelineEvent> TimelineEvents { get; set; }
     public DbSet<Vendor> Vendors { get; set; }
-    public DbSet<Message> Messages { get; set; }
     public DbSet<ActivityLog> ActivityLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -28,12 +26,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         base.OnModelCreating(builder);
         builder.Entity<Wedding>().HasQueryFilter(w => !w.IsDeleted);
         builder.Entity<WeddingTask>().HasQueryFilter(wt => !wt.IsDeleted);
-        builder.Entity<Notification>().HasQueryFilter(n => !n.IsDeleted);
         builder.Entity<Guest>().HasQueryFilter(g => !g.IsDeleted);
         builder.Entity<Budget>().HasQueryFilter(b => !b.IsDeleted);
         builder.Entity<TimelineEvent>().HasQueryFilter(te => !te.IsDeleted);
         builder.Entity<Vendor>().HasQueryFilter(v => !v.IsDeleted);
-        builder.Entity<Message>().HasQueryFilter(m => !m.IsDeleted);
 
         // Configure relationships
         builder.Entity<Wedding>()
@@ -52,10 +48,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .WithMany()
             .HasForeignKey(wt => wt.UserId);
 
-        builder.Entity<Notification>()
-            .HasOne(n => n.User)
-            .WithMany()
-            .HasForeignKey(n => n.UserId);
+       
 
         builder.Entity<Guest>()
             .HasOne(g => g.Wedding)
@@ -78,15 +71,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .HasForeignKey(v => v.WeddingId)
             .IsRequired(false);
 
-        builder.Entity<Message>()
-            .HasOne(m => m.Sender)
-            .WithMany()
-            .HasForeignKey(m => m.SenderId);
-
-        builder.Entity<Message>()
-            .HasOne(m => m.Receiver)
-            .WithMany()
-            .HasForeignKey(m => m.ReceiverId);
+      
 
         builder.Entity<ActivityLog>()
             .HasOne(al => al.User)

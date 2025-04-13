@@ -8,6 +8,7 @@ using DreamyDayWeddingPlanningWeb.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using DreamyDayWeddingPlanningWeb.Models.Validators;
 using FluentValidation;
+using DreamyDayWeddingPlanningWeb.Business.Services;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection") ?? throw new InvalidOperationException("Connection string 'ApplicationDbContextConnection' not found.");
 
@@ -35,6 +36,8 @@ builder.Services.AddValidatorsFromAssemblyContaining<VendorValidator>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IWeddingTaskService, WeddingTaskService>();
+builder.Services.AddScoped<IGuestService, GuestService>();
+
 
 
 var app = builder.Build();
