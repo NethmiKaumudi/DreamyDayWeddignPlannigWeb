@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DreamyDayWeddingPlanningWeb.Migrations
 {
     /// <inheritdoc />
-    public partial class Add : Migration
+    public partial class add : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -89,6 +89,7 @@ namespace DreamyDayWeddingPlanningWeb.Migrations
                     IsApproved = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     Reviews = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsBooked = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>

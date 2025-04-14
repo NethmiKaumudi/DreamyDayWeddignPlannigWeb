@@ -14,9 +14,10 @@
             <hr style="border-top: 1px solid #eee; margin-bottom: 25px;" />
 
             <dl class="row" style="margin-bottom: 20px;">
+                <dt class="col-sm-4" style="font-weight: 600; color: #555; font-size: 16px; padding-bottom: 10px;">WeddingId</dt>
+                <dd class="col-sm-8" style="font-size: 16px; color: #333; padding-bottom: 10px;">@Html.DisplayFor(model => model.WeddingId)</dd>
                 <dt class="col-sm-4" style="font-weight: 600; color: #555; font-size: 16px; padding-bottom: 10px;">Name</dt>
                 <dd class="col-sm-8" style="font-size: 16px; color: #333; padding-bottom: 10px;">@Html.DisplayFor(model => model.Name)</dd>
-
                 <dt class="col-sm-4" style="font-weight: 600; color: #555; font-size: 16px; padding-bottom: 10px;">RSVP Status</dt>
                 <dd class="col-sm-8" style="font-size: 16px; color: #333; padding-bottom: 10px;">
                     @if (Model.HasRSVPed)
@@ -28,10 +29,8 @@
                         <span class="badge bg-warning text-dark" style="background-color: #ffc107; color: #333; padding: 8px 12px; border-radius: 15px; font-size: 0.9em;">No</span>
                     }
                 </dd>
-
                 <dt class="col-sm-4" style="font-weight: 600; color: #555; font-size: 16px; padding-bottom: 10px;">Meal Preference</dt>
                 <dd class="col-sm-8" style="font-size: 16px; color: #333; padding-bottom: 10px;">@Html.DisplayFor(model => model.MealPreference)</dd>
-
                 <dt class="col-sm-4" style="font-weight: 600; color: #555; font-size: 16px; padding-bottom: 10px;">Seating Arrangement</dt>
                 <dd class="col-sm-8" style="font-size: 16px; color: #333; padding-bottom: 10px;">@Html.DisplayFor(model => model.SeatingArrangement)</dd>
             </dl>

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using FluentValidation;
 using DreamyDayWeddingPlanningWeb.Areas.Identity.Data;
 using DreamyDayWeddingPlanningWeb.Business.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace DreamyDayWeddingPlanningWeb.Controllers
 {
@@ -15,15 +16,20 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
         private readonly IWeddingTaskService _weddingTaskService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IValidator<WeddingTask> _validator;
+        private readonly ApplicationDbContext _context;
 
-        public WeddingTasksController(IWeddingTaskService weddingTaskService, UserManager<ApplicationUser> userManager, IValidator<WeddingTask> validator)
+        public WeddingTasksController(
+            IWeddingTaskService weddingTaskService,
+            UserManager<ApplicationUser> userManager,
+            IValidator<WeddingTask> validator,
+            ApplicationDbContext context)
         {
             _weddingTaskService = weddingTaskService;
             _userManager = userManager;
             _validator = validator;
+            _context = context;
         }
 
-        // GET: WeddingTasks
         public async Task<IActionResult> Index()
         {
             try
@@ -39,12 +45,11 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
             }
         }
 
-        // GET: WeddingTasks/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            if (id == null || id <= 0)
             {
-                TempData["ErrorMessage"] = "Task ID cannot be null.";
+                TempData["ErrorMessage"] = "Task ID cannot be null or invalid.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -66,13 +71,11 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
             }
         }
 
-        // GET: WeddingTasks/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: WeddingTasks/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TaskName,Deadline,IsCompleted")] WeddingTask weddingTask)
@@ -101,12 +104,11 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
             }
         }
 
-        // GET: WeddingTasks/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            if (id == null || id <= 0)
             {
-                TempData["ErrorMessage"] = "Task ID cannot be null.";
+                TempData["ErrorMessage"] = "Task ID cannot be null or invalid.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -128,7 +130,6 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
             }
         }
 
-        // POST: WeddingTasks/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,TaskName,Deadline,IsCompleted")] WeddingTask weddingTask)
@@ -162,12 +163,11 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
             }
         }
 
-        // GET: WeddingTasks/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            if (id == null || id <= 0)
             {
-                TempData["ErrorMessage"] = "Task ID cannot be null.";
+                TempData["ErrorMessage"] = "Task ID cannot be null or invalid.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -189,7 +189,6 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
             }
         }
 
-        // POST: WeddingTasks/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -213,21 +212,42 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
             }
         }
 
-        // POST: WeddingTasks/Complete/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Complete(int id)
         {
             try
             {
+                if (id <= 0)
+                {
+                    return Json(new { success = false, message = "Task ID must be a positive integer." });
+                }
+
                 var userId = _userManager.GetUserId(User);
                 var task = await _weddingTaskService.GetTaskByIdAsync(id, userId);
                 if (task == null)
                 {
-                    return NotFound();
+                    return Json(new { success = false, message = "Task not found." });
+                }
+
+                if (task.IsCompleted)
+                {
+                    return Json(new { success = false, message = "Task is already completed." });
                 }
 
                 task.IsCompleted = true;
                 await _weddingTaskService.UpdateTaskAsync(task);
+
+                var wedding = await _context.Weddings
+                    .Where(w => w.UserId == userId && !w.IsDeleted)
+                    .FirstOrDefaultAsync();
+                if (wedding != null)
+                {
+                    var progress = await _weddingTaskService.CalculateTaskProgressAsync(userId);
+                    wedding.Progress = (int)Math.Round(progress);
+                    _context.Update(wedding);
+                    await _context.SaveChangesAsync();
+                }
 
                 return Json(new { success = true });
             }

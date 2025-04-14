@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using DreamyDayWeddingPlanningWeb.Data;
 using DreamyDayWeddingPlanningWeb.Areas.Identity.Data;
@@ -39,6 +39,8 @@ builder.Services.AddScoped<IWeddingTaskService, WeddingTaskService>();
 builder.Services.AddScoped<IWeddingService, WeddingService>();
 builder.Services.AddScoped<IGuestService, GuestService>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
+builder.Services.AddScoped<IWeddingTimeLineService, WeddingTimeLineService>();
+
 
 
 

@@ -5,7 +5,7 @@
     Layout = "~/Views/Shared/_CoupleLayout.cshtml";
 }
 
-<h1 style="font-size: 24px; margin-bottom: 20px;">Delete Guest</h1>
+<h2 class="mb-4 mt-4 text-center" style="font-size: 24px; color: #333;">Delete Guest</h2>
 
 <div class="container-fluid">
     <div class="card">
@@ -13,6 +13,8 @@
         <hr class="mb-3" />
 
         <dl class="row">
+            <dt class="col-sm-4">WeddingId</dt>
+            <dd class="col-sm-8">@Html.DisplayFor(model => model.WeddingId)</dd>
             <dt class="col-sm-4">Name</dt>
             <dd class="col-sm-8">@Html.DisplayFor(model => model.Name)</dd>
             <dt class="col-sm-4">RSVP Status</dt>

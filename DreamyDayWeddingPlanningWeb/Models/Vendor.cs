@@ -26,6 +26,8 @@ namespace DreamyDayWeddingPlanningWeb.Models
 
         //public int? WeddingId { get; set; }
         //public Wedding? Wedding { get; set; }
+        public bool IsBooked { get; set; } = false;
+
         public bool IsDeleted { get; set; } = false;
     }
 }

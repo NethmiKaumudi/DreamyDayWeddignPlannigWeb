@@ -60,6 +60,43 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
                 return RedirectToAction("Error", "Home");
             }
         }
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                TempData["ErrorMessage"] = "Budget ID cannot be null.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                var userId = _userManager.GetUserId(User);
+                if (string.IsNullOrEmpty(userId))
+                {
+                    TempData["ErrorMessage"] = "User not authenticated.";
+                    return RedirectToAction("Login", "Account", new { area = "Identity" });
+                }
+
+                var budget = await _budgetService.GetBudgetByIdAsync(id.Value, userId);
+                if (budget == null)
+                {
+                    TempData["ErrorMessage"] = "Budget item not found.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                return View(budget);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction("Error", "Home");
+            }
+        }
 
         public IActionResult Create(int weddingId)
         {

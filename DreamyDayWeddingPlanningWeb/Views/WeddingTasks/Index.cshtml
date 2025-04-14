@@ -5,12 +5,29 @@
     Layout = "~/Views/Shared/_CoupleLayout.cshtml";
 }
 
-<h1 style="font-size: 24px; margin-bottom: 20px;">Wedding TasksList</h1>
+<h2 class="mb-3 mt-3 ms-3 font-add font-16"  >Wedding Tasks List</h2>
 
 <div class="container-fluid">
     <div class="card">
         <h2 class="mb-3">Your Wedding Tasks</h2>
         <hr class="mb-3" />
+
+        @{
+            var totalTasks = Model.Count();
+            var completedTasks = Model.Count(t => t.IsCompleted);
+            var progress = totalTasks > 0 ? (double)completedTasks / totalTasks * 100 : 0;
+        }
+        <div class="mb-3">
+            <h5>Task Progress</h5>
+            <div class="progress">
+                <div class="progress-bar bg-success" role="progressbar" 
+                     style="width: @progress%;" 
+                     aria-valuenow="@progress" 
+                     aria-valuemin="0" aria-valuemax="100">
+                    @String.Format("{0:F1}%", progress)
+                </div>
+            </div>
+        </div>
 
         @if (TempData["SuccessMessage"] != null)
         {
@@ -40,7 +57,7 @@
             <table class="table table-striped table-hover">
                 <thead class="table-dark">
                     <tr>
-                        <th></th> <!-- Checkbox column -->
+                        <th></th>
                         <th>@Html.DisplayNameFor(model => model.TaskName)</th>
                         <th>@Html.DisplayNameFor(model => model.Deadline)</th>
                         <th>@Html.DisplayNameFor(model => model.IsCompleted)</th>
@@ -52,10 +69,16 @@
                     {
                         <tr>
                             <td>
-                                <input type="checkbox" id="task-@item.Id" @(item.IsCompleted ? "checked disabled" : "") onchange="completeTask('@item.Id', this)" />
+                                <input type="checkbox" id="task-@item.Id" @(item.IsCompleted ? "checked disabled" : "") onchange="completeTask(@item.Id, this)" />
                             </td>
                             <td>@Html.DisplayFor(modelItem => item.TaskName)</td>
-                            <td>@item.Deadline.ToString("MMM dd, yyyy")</td>
+                            <td>
+                                @item.Deadline.ToString("MMM dd, yyyy")
+                                @if (!item.IsCompleted && item.Deadline < DateTime.Now)
+                                {
+                                    <span class="badge bg-danger ms-2">Overdue</span>
+                                }
+                            </td>
                             <td>
                                 <span id="status-@item.Id" class="badge @(item.IsCompleted ? "bg-success" : "bg-warning")">
                                     @(item.IsCompleted ? "Completed" : "Pending")
@@ -87,20 +110,20 @@
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
-        .card h2 {
-            font-size: 20px;
-            color: #333;
-        }
+    .card h2 {
+        font-size: 20px;
+        color: #333;
+    }
 
     .table {
         width: 100%;
         border-collapse: collapse;
     }
 
-        .table th, .table td {
-            padding: 10px;
-            text-align: left;
-        }
+    .table th, .table td {
+        padding: 10px;
+        text-align: left;
+    }
 
     .table-dark {
         background-color: #343a40;
@@ -122,6 +145,11 @@
         color: #333;
     }
 
+    .bg-danger {
+        background-color: #dc3545;
+        color: #fff;
+    }
+
     .btn-primary {
         background-color: #007bff;
         border: none;
@@ -130,52 +158,65 @@
         border-radius: 5px;
     }
 
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
 
     .btn-outline-primary {
         border-color: #007bff;
         color: #007bff;
     }
 
-        .btn-outline-primary:hover {
-            background-color: #007bff;
-            color: #fff;
-        }
+    .btn-outline-primary:hover {
+        background-color: #007bff;
+        color: #fff;
+    }
 
     .btn-outline-info {
         border-color: #17a2b8;
         color: #17a2b8;
     }
 
-        .btn-outline-info:hover {
-            background-color: #17a2b8;
-            color: #fff;
-        }
+    .btn-outline-info:hover {
+        background-color: #17a2b8;
+        color: #fff;
+    }
 
     .btn-outline-danger {
         border-color: #dc3545;
         color: #dc3545;
     }
 
-        .btn-outline-danger:hover {
-            background-color: #dc3545;
-            color: #fff;
-        }
+    .btn-outline-danger:hover {
+        background-color: #dc3545;
+        color: #fff;
+    }
 
     .alert {
         margin-bottom: 15px;
+    }
+
+    .progress {
+        height: 25px;
+        border-radius: 5px;
+        background-color: #f1f1f1;
+    }
+
+    .progress-bar {
+        background-color: #28a745;
+        transition: width 0.6s ease;
+        font-size: 14px;
+        line-height: 25px;
+    }
+
+    .ms-2 {
+        margin-left: 0.5rem;
     }
 </style>
 
 @section Scripts {
     <script>
         function completeTask(taskId, checkbox) {
-            // Disable the checkbox to prevent multiple clicks
-            checkbox.disabled = true;
-
-            // Send AJAX request to mark the task as completed
             fetch('/WeddingTasks/Complete/' + taskId, {
                 method: 'POST',
                 headers: {
@@ -186,21 +227,34 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Update the status badge
+                    checkbox.checked = true;
+                    checkbox.disabled = true;
                     const statusBadge = document.getElementById('status-' + taskId);
                     statusBadge.classList.remove('bg-warning');
                     statusBadge.classList.add('bg-success');
                     statusBadge.textContent = 'Completed';
+
+                    const progressBar = document.querySelector('.progress-bar');
+                    const totalTasks = @totalTasks;
+                    const completedTasks = document.querySelectorAll('.bg-success').length;
+                    const newProgress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+                    progressBar.style.width = newProgress + '%';
+                    progressBar.textContent = newProgress.toFixed(1) + '%';
+                    progressBar.setAttribute('aria-valuenow', newProgress);
+
+                    const deadlineCell = checkbox.closest('tr').querySelector('td:nth-child(3)');
+                    const overdueBadge = deadlineCell.querySelector('.bg-danger');
+                    if (overdueBadge) {
+                        overdueBadge.remove();
+                    }
                 } else {
                     alert('Error: ' + data.message);
-                    checkbox.checked = false; // Revert the checkbox
-                    checkbox.disabled = false; // Re-enable the checkbox
+                    checkbox.checked = false;
                 }
             })
             .catch(error => {
                 alert('Error: ' + error);
-                checkbox.checked = false; // Revert the checkbox
-                checkbox.disabled = false; // Re-enable the checkbox
+                checkbox.checked = false;
             });
         }
     </script>

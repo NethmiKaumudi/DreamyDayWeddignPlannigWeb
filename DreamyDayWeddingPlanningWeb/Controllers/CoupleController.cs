@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using DreamyDayWeddingPlanningWeb.Business.Interfaces;
 using DreamyDayWeddingPlanningWeb.Data;
 using System.Linq;
+using System.Collections.Generic; // Added for List<T>
 
 namespace DreamyDayWeddingPlanningWeb.Controllers
 {
@@ -19,6 +20,8 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
         private readonly IWeddingService _weddingService;
         private readonly IGuestService _guestService;
         private readonly IBudgetService _budgetService;
+        private readonly IWeddingTaskService _weddingTaskService;
+        private readonly IWeddingTimeLineService _timelineService;
         private readonly ApplicationDbContext _context;
 
         public CoupleController(
@@ -27,6 +30,8 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
             IWeddingService weddingService,
             IGuestService guestService,
             IBudgetService budgetService,
+            IWeddingTaskService weddingTaskService,
+            IWeddingTimeLineService timelineService,
             ApplicationDbContext context)
         {
             _userManager = userManager;
@@ -34,6 +39,8 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
             _weddingService = weddingService;
             _guestService = guestService;
             _budgetService = budgetService;
+            _weddingTaskService = weddingTaskService;
+            _timelineService = timelineService;
             _context = context;
         }
 
@@ -50,26 +57,32 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
                 .Include(w => w.Planner)
                 .ToListAsync();
 
+            // Fetch tasks, default to empty list if none found
             var tasks = await _context.WeddingTasks
                 .Where(t => t.UserId == user.Id && !t.IsDeleted && !t.IsCompleted)
                 .OrderBy(t => t.Deadline)
-                .ToListAsync();
+                .ToListAsync() ?? new List<WeddingTask>();
 
             var guests = await _guestService.GetGuestsByUserIdAsync(user.Id);
-            var guestCount = guests.Count;
+            var guestCount = guests?.Count ?? 0;
 
-            if (weddings == null || weddings.Count == 0)
+            var progress = await _weddingTaskService.CalculateTaskProgressAsync(user.Id);
+
+            // Fetch planners for the "Create Wedding" form if no wedding exists
+            var planners = await _context.Users
+                .Where(u => u.Role == "Planner")
+                .Select(u => new { u.Id, u.UserName, u.ContactNumber })
+                .ToListAsync();
+
+            ViewBag.Planners = planners;
+            ViewBag.Tasks = tasks; // Always a non-null List<WeddingTask>
+            ViewBag.GuestCount = guestCount;
+            ViewBag.TaskProgress = progress;
+
+            if (!weddings.Any())
             {
                 ViewBag.HasWedding = false;
-
-                // Modified: Fetch planners directly from aspnetusers based on the 'Role' column
-                var planners = await _context.Users
-                    .Where(u => u.Role == "Planner")
-                    .Select(u => new { u.Id, u.UserName, u.ContactNumber })
-                    .ToListAsync();
-
-                ViewBag.Planners = planners;
-                return View("Dashboard", null);
+                return View("Dashboard");
             }
 
             var firstWedding = weddings.First();
@@ -79,10 +92,16 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
                 TempData["BudgetExceededMessage"] = "Warning: You have exceeded your wedding budget!";
             }
 
+            firstWedding.Progress = (int)Math.Round(progress);
+            await _weddingService.UpdateWeddingAsync(firstWedding);
+
+            // Fetch timeline events for the wedding
+            var timelineEvents = await _timelineService.GetTimelineEventsByWeddingIdAsync(firstWedding.Id) ?? new List<TimelineEvent>();
+            ViewBag.TimelineEvents = timelineEvents;
+
             ViewBag.HasWedding = true;
             ViewBag.Weddings = weddings;
-            ViewBag.Tasks = tasks;
-            ViewBag.GuestCount = guestCount;
+
             return View("Dashboard", firstWedding);
         }
 
@@ -98,15 +117,13 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
             if (string.IsNullOrEmpty(plannerId))
             {
                 ModelState.AddModelError("plannerId", "Please select a planner.");
-                // Modified: Fetch planners directly from aspnetusers based on the 'Role' column
                 var planners = await _context.Users
                     .Where(u => u.Role == "Planner")
                     .Select(u => new { u.Id, u.UserName, u.ContactNumber })
                     .ToListAsync();
                 ViewBag.Planners = planners;
                 ViewBag.HasWedding = false;
-
-                return View("Dashboard", null);
+                return View("Dashboard");
             }
 
             var wedding = new Wedding
@@ -142,7 +159,6 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
                 return RedirectToAction("Dashboard");
             }
 
-            // Modified: Fetch planners directly from aspnetusers based on the 'Role' column
             var planners = await _context.Users
                 .Where(u => u.Role == "Planner")
                 .Select(u => new { u.Id, u.UserName, u.ContactNumber })
@@ -211,19 +227,16 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
             return RedirectToAction("Index", "Budgets");
         }
 
-        public IActionResult Timeline()
+        public async Task<IActionResult> Timeline()
         {
-            return View();
+            return RedirectToAction("Index", "Timeline");
         }
 
-        public IActionResult VendorCatalog()
+        public IActionResult Vendors()
         {
-            return View();
+            return RedirectToAction("Index", "Vendors");
         }
 
-        public IActionResult Profile()
-        {
-            return View();
-        }
+      
     }
 }
