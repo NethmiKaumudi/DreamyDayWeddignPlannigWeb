@@ -25,7 +25,7 @@ namespace DreamyDayWeddingPlanningWeb.Services
                     throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
 
                 return await _context.WeddingTasks
-                    .Where(t => t.UserId == userId)
+                    .Where(t => t.UserId == userId && !t.IsDeleted)
                     .ToListAsync();
             }
             catch (Exception ex)
@@ -44,7 +44,7 @@ namespace DreamyDayWeddingPlanningWeb.Services
                     throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
 
                 var task = await _context.WeddingTasks
-                    .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
+                    .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId && !t.IsDeleted);
 
                 if (task == null)
                     throw new KeyNotFoundException($"Task with ID {id} not found for the user.");
@@ -88,11 +88,9 @@ namespace DreamyDayWeddingPlanningWeb.Services
                 if (existingTask == null)
                     throw new KeyNotFoundException($"Task with ID {weddingTask.Id} not found.");
 
-                // Update properties
                 existingTask.TaskName = weddingTask.TaskName;
                 existingTask.Deadline = weddingTask.Deadline;
                 existingTask.IsCompleted = weddingTask.IsCompleted;
-                // UserId should not be updated
 
                 _context.WeddingTasks.Update(existingTask);
                 await _context.SaveChangesAsync();
@@ -121,11 +119,11 @@ namespace DreamyDayWeddingPlanningWeb.Services
                     throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
 
                 var task = await _context.WeddingTasks
-                    .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
+                    .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId && !t.IsDeleted);
                 if (task == null)
                     throw new KeyNotFoundException($"Task with ID {id} not found for the user.");
 
-                task.IsDeleted = true; // Soft delete by setting IsDeleted to true
+                task.IsDeleted = true;
                 _context.WeddingTasks.Update(task);
                 await _context.SaveChangesAsync();
             }
@@ -136,6 +134,29 @@ namespace DreamyDayWeddingPlanningWeb.Services
             catch (Exception ex)
             {
                 throw new Exception($"An unexpected error occurred while soft-deleting task with ID {id}.", ex);
+            }
+        }
+
+        public async Task<double> CalculateTaskProgressAsync(string userId)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(userId))
+                    throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
+
+                var tasks = await _context.WeddingTasks
+                    .Where(t => t.UserId == userId && !t.IsDeleted)
+                    .ToListAsync();
+
+                if (tasks.Count == 0)
+                    return 0;
+
+                var completedTasks = tasks.Count(t => t.IsCompleted);
+                return (double)completedTasks / tasks.Count * 100;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while calculating task progress.", ex);
             }
         }
     }

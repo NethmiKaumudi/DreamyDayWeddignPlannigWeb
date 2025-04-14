@@ -9,5 +9,6 @@ namespace DreamyDayWeddingPlanningWeb.Business.Interfaces
         Task CreateTaskAsync(WeddingTask weddingTask);
         Task UpdateTaskAsync(WeddingTask weddingTask);
         Task DeleteTaskAsync(int id, string userId);
+        Task<double> CalculateTaskProgressAsync(string userId);
     }
 }

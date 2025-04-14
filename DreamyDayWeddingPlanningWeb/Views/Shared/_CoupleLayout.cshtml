@@ -58,9 +58,10 @@
 
         .container {
             display: flex;
-            height: calc(100vh - 60px);
+            height: calc(100vh - 110px); /* Adjust for navbar and footer */
             padding: 0;
             margin: 0;
+            width: 100vw; /* Ensure container takes full viewport width */
         }
 
         .sidebar {
@@ -111,8 +112,8 @@
         .content {
             flex: 1;
             padding: 0;
-            overflow-y: auto;
-            max-width: calc(100% - 250px); /* Sidebar is 250px wide */
+            overflow-y: hidden;
+            width: calc(100% - 250px); /* Ensure it takes full width minus sidebar */
             height: 100%;
         }
 
@@ -124,6 +125,12 @@
             position: fixed;
             bottom: 0;
             width: 100%;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Override Bootstrap's .container max-width */
+        .container {
+            max-width: 100% !important; /* Remove Bootstrap's max-width constraint */
         }
     </style>
 </head>
@@ -170,11 +177,6 @@
                 <li>
                     <a asp-controller="Couple" asp-action="Vendors" class="sidebar-btn">
                         <i class="fas fa-store"></i> Vendor Catalog
-                    </a>
-                </li>
-                <li>
-                    <a asp-controller="Couple" asp-action="Profile" class="sidebar-btn">
-                        <i class="fas fa-user"></i> Profile Settings
                     </a>
                 </li>
             </ul>

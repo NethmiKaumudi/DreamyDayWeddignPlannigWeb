@@ -32,14 +32,24 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
         {
             try
             {
-                var userId = _userManager.GetUserId(User);
-                if (string.IsNullOrEmpty(userId))
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
                 {
                     TempData["ErrorMessage"] = "User not authenticated.";
                     return RedirectToAction("Login", "Account", new { area = "Identity" });
                 }
 
-                var guests = await _guestService.GetGuestsByUserIdAsync(userId);
+                var wedding = await _context.Weddings
+                    .Where(w => w.UserId == user.Id && !w.IsDeleted)
+                    .FirstOrDefaultAsync();
+
+                if (wedding == null)
+                {
+                    TempData["ErrorMessage"] = "No wedding found for this user. Please create a wedding first.";
+                    return RedirectToAction("Dashboard", "Couple");
+                }
+
+                var guests = await _guestService.GetGuestsByUserIdAsync(user.Id);
 
                 // Apply RSVP filter
                 if (rsvpFilter == "Yes")
@@ -53,6 +63,7 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
 
                 // Populate RSVP filter dropdown
                 ViewData["RSVPFilter"] = new SelectList(new List<string> { "All", "Yes", "No" }, rsvpFilter);
+                ViewBag.WeddingId = wedding.Id; // Pass WeddingId for Create/Edit links
 
                 return View(guests);
             }
@@ -97,35 +108,31 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
         }
 
         // GET: Guests/Create
-        public IActionResult Create(int? weddingId)
+        public async Task<IActionResult> Create()
         {
-            var userId = _userManager.GetUserId(User);
-            if (string.IsNullOrEmpty(userId))
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
             {
                 TempData["ErrorMessage"] = "User not authenticated.";
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
             }
 
-            // Fetch weddings for the authenticated user
-            var weddings = _context.Weddings
-                .Where(w => w.UserId == userId && !w.IsDeleted)
-                .ToList();
+            // Fetch the wedding for the authenticated user
+            var wedding = await _context.Weddings
+                .Where(w => w.UserId == user.Id && !w.IsDeleted)
+                .FirstOrDefaultAsync();
 
-            if (!weddings.Any())
+            if (wedding == null)
             {
-                TempData["ErrorMessage"] = "No weddings found. Please create a wedding first.";
+                TempData["ErrorMessage"] = "No wedding found for this user. Please create a wedding first.";
                 return RedirectToAction("Dashboard", "Couple");
             }
 
-            // Pre-select the weddingId if provided and valid (i.e., the wedding belongs to the user)
-            if (weddingId.HasValue && weddings.Any(w => w.Id == weddingId.Value))
+            // Create a new Guest model with the WeddingId pre-filled
+            var guest = new Guest
             {
-                ViewData["WeddingId"] = new SelectList(weddings, "Id", "Id", weddingId.Value);
-            }
-            else
-            {
-                ViewData["WeddingId"] = new SelectList(weddings, "Id", "Id");
-            }
+                WeddingId = wedding.Id
+            };
 
             // Populate meal types dropdown
             var mealTypes = new List<string>
@@ -141,7 +148,7 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
             };
             ViewData["MealTypes"] = new SelectList(mealTypes);
 
-            return View();
+            return View(guest);
         }
 
         // POST: Guests/Create
@@ -160,7 +167,6 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
             if (wedding == null)
             {
                 TempData["ErrorMessage"] = "Invalid Wedding ID.";
-                ViewData["WeddingId"] = new SelectList(_context.Weddings.Where(w => w.UserId == userId), "Id", "Id", guest.WeddingId);
                 var mealTypes = new List<string>
                 {
                     "Vegetarian", "Vegan", "Non-Vegetarian", "Gluten-Free", "Dairy-Free", "Nut-Free", "Halal", "Kosher"
@@ -195,7 +201,6 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
                 }
             }
 
-            ViewData["WeddingId"] = new SelectList(_context.Weddings.Where(w => w.UserId == userId), "Id", "Id", guest.WeddingId);
             var mealTypesError = new List<string>
             {
                 "Vegetarian", "Vegan", "Non-Vegetarian", "Gluten-Free", "Dairy-Free", "Nut-Free", "Halal", "Kosher"
@@ -223,10 +228,6 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
                 }
 
                 var guest = await _guestService.GetGuestByIdAsync(id.Value, userId);
-
-                // Materialize the Weddings query before passing to SelectList
-                var weddings = await _context.Weddings.Where(w => w.UserId == userId).ToListAsync();
-                ViewData["WeddingId"] = new SelectList(weddings, "Id", "Id", guest.WeddingId);
 
                 // Populate meal types dropdown
                 var mealTypes = new List<string>
@@ -278,7 +279,6 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
             if (wedding == null)
             {
                 TempData["ErrorMessage"] = "Invalid Wedding ID.";
-                ViewData["WeddingId"] = new SelectList(_context.Weddings.Where(w => w.UserId == userId), "Id", "Id", guest.WeddingId);
                 var mealTypes = new List<string>
                 {
                     "Vegetarian", "Vegan", "Non-Vegetarian", "Gluten-Free", "Dairy-Free", "Nut-Free", "Halal", "Kosher"
@@ -310,8 +310,6 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
                 catch (Exception ex)
                 {
                     TempData["ErrorMessage"] = ex.Message;
-                    // Re-populate dropdowns and return the view with the current guest data
-                    ViewData["WeddingId"] = new SelectList(_context.Weddings.Where(w => w.UserId == userId), "Id", "Id", guest.WeddingId);
                     var mealTypes = new List<string>
                     {
                         "Vegetarian", "Vegan", "Non-Vegetarian", "Gluten-Free", "Dairy-Free", "Nut-Free", "Halal", "Kosher"
@@ -321,8 +319,6 @@ namespace DreamyDayWeddingPlanningWeb.Controllers
                 }
             }
 
-            // If ModelState is invalid, re-populate dropdowns and return the view
-            ViewData["WeddingId"] = new SelectList(_context.Weddings.Where(w => w.UserId == userId), "Id", "Id", guest.WeddingId);
             var mealTypesError = new List<string>
             {
                 "Vegetarian", "Vegan", "Non-Vegetarian", "Gluten-Free", "Dairy-Free", "Nut-Free", "Halal", "Kosher"

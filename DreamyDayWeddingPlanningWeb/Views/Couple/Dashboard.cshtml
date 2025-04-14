@@ -1,13 +1,15 @@
 ﻿@model DreamyDayWeddingPlanningWeb.Models.Wedding
+@using System.Collections.Generic
+@using DreamyDayWeddingPlanningWeb.Models
 
 @{
     ViewData["Title"] = "Dashboard";
     Layout = "~/Views/Shared/_CoupleLayout.cshtml";
 }
 
-<h1 style="font-size: 24px; margin-bottom: 20px;">Dashboard</h1>
+<div class="container-fluid">
+    <h1 style="font-size: 24px; margin-bottom: 20px; color: #333;">Dashboard</h1>
 
-<div class="container-fluid" style="padding: 15px;">
     @if (TempData["PlannerError"] != null)
     {
         <div class="alert alert-warning" role="alert">
@@ -20,50 +22,52 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="card">
-                    <h2 class="mb-3">Create Your Wedding</h2>
-                    <hr class="mb-3" />
-                    <form asp-action="CreateWedding" method="post">
-                        
-                        <div class="mb-3">
-                            <label for="weddingDate" class="form-label">Wedding Date</label>
-                            <input type="date" id="weddingDate" name="weddingDate" class="form-control" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="totalBudget" class="form-label">Total Budget</label>
-                            <input type="number" id="totalBudget" name="totalBudget" class="form-control" step="0.01" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="plannerId" class="form-label">Planner</label>
-                            <select id="plannerId" name="plannerId" class="form-control">
-                                <option value="">Select a planner</option>
-                                @if (ViewBag.Planners != null)
-                                {
-                                    @foreach (var planner in ViewBag.Planners)
+                    <h2 class="card-header">Create Your Wedding</h2>
+                    <div class="card-body">
+                        <form asp-action="CreateWedding" method="post">
+                            @Html.AntiForgeryToken()
+                            <div class="mb-3">
+                                <label for="weddingDate" class="form-label">Wedding Date</label>
+                                <input type="date" id="weddingDate" name="weddingDate" class="form-control" required />
+                            </div>
+                            <div class="mb-3">
+                                <label for="totalBudget" class="form-label">Total Budget</label>
+                                <input type="number" id="totalBudget" name="totalBudget" class="form-control" step="0.01" required />
+                            </div>
+                            <div class="mb-3">
+                                <label for="plannerId" class="form-label">Planner</label>
+                                <select id="plannerId" name="plannerId" class="form-control" required>
+                                    <option value="">Select a planner</option>
+                                    @if (ViewBag.Planners != null)
                                     {
-                                        <option value="@planner.Id">@planner.UserName (@planner.ContactNumber)</option>
+                                        @foreach (var planner in ViewBag.Planners)
+                                        {
+                                            <option value="@planner.Id">@planner.UserName (@planner.ContactNumber)</option>
+                                        }
                                     }
+                                </select>
+                                @if (ViewData.ModelState.ContainsKey("plannerId"))
+                                {
+                                    <span class="text-danger">@ViewData.ModelState["plannerId"].Errors.FirstOrDefault()?.ErrorMessage</span>
                                 }
-                            </select>
-                            @if (ViewData.ModelState.ContainsKey("plannerId"))
-                            {
-                                <span class="text-danger">@ViewData.ModelState["plannerId"].Errors.FirstOrDefault()?.ErrorMessage</span>
-                            }
-                        </div>
-                        <button type="submit" class="btn btn-primary">Create Wedding</button>
-                    </form>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Create Wedding</button>
+                        </form>
+                    </div>
                 </div>
             </div>
 
             <div class="col-md-6">
                 <div class="card">
-                    <h2 class="mb-3">Getting Started</h2>
-                    <hr class="mb-3" />
-                    <p class="text-muted">Start by creating your wedding event. Once created, you’ll be able to manage guests, budget, and much more.</p>
-                    <ul>
-                        <li>Assign a wedding planner to help you organize.</li>
-                        <li>Track your total and spent budget.</li>
-                        <li>Add guests and tasks to keep everything on schedule.</li>
-                    </ul>
+                    <h2 class="card-header">Getting Started</h2>
+                    <div class="card-body">
+                        <p class="text-muted">Start by creating your wedding event. Once created, you’ll be able to manage guests, budget, and much more.</p>
+                        <ul>
+                            <li>Assign a wedding planner to help you organize.</li>
+                            <li>Track your total and spent budget.</li>
+                            <li>Add guests and tasks to keep everything on schedule.</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -73,96 +77,122 @@
         <div class="row mb-4">
             <div class="col-md-6">
                 <div class="card">
-                    <h2 class="mb-3">Wedding Details</h2>
-                    <hr class="mb-3" />
-                    <dl class="row">
-                        <dt class="col-sm-4">Wedding Title</dt>
-                        <dt class="col-sm-4">Wedding Date</dt>
-                        <dd class="col-sm-8">@Model.WeddingDate.ToString("MM/dd/yyyy")</dd>
-                        <dt class="col-sm-4">Total Budget</dt>
-                        <dd class="col-sm-8">Rs @Model.TotalBudget.ToString("N2")</dd>
-                        <dt class="col-sm-4">Spent Budget</dt>
-                        <dd class="col-sm-8">Rs @Model.SpentBudget.ToString("N2")</dd>
-                        <dt class="col-sm-4">Planner</dt>
-                        <dd class="col-sm-8">
-                            @(Model.Planner != null ? $"{Model.Planner.UserName} ({Model.Planner.ContactNumber})" : "No Planner Assigned")
-                        </dd>
-                    </dl>
-                    <div>
-                        <a asp-action="EditWedding" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
-                        <a asp-action="DeleteWedding" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
+                    <h2 class="card-header">Wedding Details</h2>
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-4">Wedding Date</dt>
+                            <dd class="col-sm-8">@Model.WeddingDate.ToString("MM/dd/yyyy")</dd>
+                            <dt class="col-sm-4">Total Budget</dt>
+                            <dd class="col-sm-8">Rs @Model.TotalBudget.ToString("N2")</dd>
+                            <dt class="col-sm-4">Spent Budget</dt>
+                            <dd class="col-sm-8">Rs @Model.SpentBudget.ToString("N2")</dd>
+                            <dt class="col-sm-4">Planner</dt>
+                            <dd class="col-sm-8">
+                                @(Model.Planner != null ? $"{Model.Planner.UserName} ({Model.Planner.ContactNumber})" : "No Planner Assigned")
+                            </dd>
+                        </dl>
+                        <div>
+                            <a asp-action="EditWedding" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+                            <a asp-action="DeleteWedding" asp-route-id="@Model.Id" class="btn btn-danger"
+                               onclick="return confirm(' Are you sure ? Yes or No')">Delete</a>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-6">
                 <div class="card">
-                    <h2 class="mb-3">Quick Stats</h2>
-                    <hr class="mb-3" />
-                    <dl class="row">
-                        <dt class="col-sm-4">
-                            <i class="fas fa-users mr-2"></i> Guests
-                        </dt>
-                        <dd class="col-sm-8">@ViewBag.GuestCount</dd>
-                        <dt class="col-sm-4">
-                            <i class="fas fa-wallet mr-2"></i> Budget
-                        </dt>
-                        <dd class="col-sm-8">Rs @Model.SpentBudget.ToString("N2") / Rs @Model.TotalBudget.ToString("N2")</dd>
-                        <dt class="col-sm-4">
-                            <i class="fas fa-calendar-alt mr-2"></i> Wedding Date
-                        </dt>
-                        <dd class="col-sm-8">@Model.WeddingDate.ToString("MM/dd/yyyy")</dd>
-                        <dt class="col-sm-4">
-                            <i class="fas fa-chart-line mr-2"></i> Progress
-                        </dt>
-                        <dd class="col-sm-8">@Model.Progress%</dd>
-                    </dl>
+                    <h2 class="card-header">Quick Stats</h2>
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-4">
+                                <i class="fas fa-users mr-2"></i> Guests
+                            </dt>
+                            <dd class="col-sm-8">@ViewBag.GuestCount</dd>
+                            <dt class="col-sm-4">
+                                <i class="fas fa-wallet mr-2"></i> Budget
+                            </dt>
+                            <dd class="col-sm-8">Rs @Model.SpentBudget.ToString("N2") / Rs @Model.TotalBudget.ToString("N2")</dd>
+                            <dt class="col-sm-4">
+                                <i class="fas fa-calendar-alt mr-2"></i> Wedding Date
+                            </dt>
+                            <dd class="col-sm-8">@Model.WeddingDate.ToString("MM/dd/yyyy")</dd>
+                            <dt class="col-sm-4">
+                                <i class="fas fa-chart-line mr-2"></i> Task Progress
+                            </dt>
+                            <dd class="col-sm-8">
+                                <div class="progress">
+                                    <div id="progress-bar" class="progress-bar bg-success" role="progressbar"
+                                         style="width: @ViewBag.TaskProgress%;"
+                                         aria-valuenow="@ViewBag.TaskProgress"
+                                         aria-valuemin="0" aria-valuemax="100">
+                                        @String.Format("{0:F1}%", ViewBag.TaskProgress)
+                                    </div>
+                                </div>
+                            </dd>
+                        </dl>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="row">
             <div class="col-md-6">
-                <div class="card" style="max-height: 500px; overflow-y: auto;">
-                    <h2 class="mb-3">Upcoming Wedding Tasks</h2>
-                    <hr class="mb-3" />
-                    @if (ViewBag.Tasks != null && ViewBag.Tasks.Count > 0)
-                    {
-                        @foreach (var task in ViewBag.Tasks)
-                        {
-                            <div class="task-item">
-                                <input type="checkbox" disabled @(task.IsCompleted ? "checked" : "") />
-                                <span>@task.TaskName (Due: @task.Deadline.ToString("yyyy-MM-dd"))</span>
-                                <span class="badge @(task.IsCompleted ? "bg-success" : "bg-warning")">
-                                    @(task.IsCompleted ? "Completed" : "Pending")
-                                </span>
-                            </div>
+                <div class="card scrollable-card">
+                    <h2 class="card-header">Upcoming Wedding Tasks</h2>
+                    <div class="card-body">
+                        @{
+                            var tasks = ViewBag.Tasks as List<WeddingTask>;
+                            if (tasks != null && tasks.Count > 0)
+                            {
+                                foreach (var task in tasks)
+                                {
+                                    <div class="task-item">
+                                        <span>@task.TaskName (Due: @task.Deadline.ToString("yyyy-MM-dd"))</span>
+                                        @if (!task.IsCompleted && task.Deadline < DateTime.Now)
+                                        {
+                                            <span class="badge bg-danger ms-2">Overdue</span>
+                                        }
+                                    </div>
+                                }
+                                <div class="mt-3">
+                                    <a asp-controller="WeddingTasks" asp-action="Index" class="btn btn-primary">Manage Task List</a>
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="text-muted">No upcoming tasks.</p>
+                            }
                         }
-                        <div class="mt-3">
-                            <a asp-controller="WeddingTasks" asp-action="Index" class="btn btn-primary">Manage Task List</a>
-                        </div>
-                    }
-                    else
-                    {
-                        <p class="text-muted">No upcoming tasks.</p>
-                    }
+                    </div>
                 </div>
             </div>
 
             <div class="col-md-6">
-                <div class="card" style="max-height: 500px; overflow-y: auto;">
-                    <h2 class="mb-3">Wedding Day Timeline</h2>
-                    <hr class="mb-3" />
-                    <ul>
-                        <li>10:00 AM - Bride's Preparation</li>
-                        <li>12:00 PM - Groom's Arrival</li>
-                        <li>02:00 PM - Ceremony Start</li>
-                        <li>03:30 PM - Reception</li>
-                        <li>07:00 PM - Dinner</li>
-                        <li>08:00 PM - Cake Cutting</li>
-                        <li>09:00 PM - First Dance</li>
-                        <li>10:00 PM - Party</li>
-                    </ul>
+                <div class="card scrollable-card">
+                    <h2 class="card-header">Wedding Day Timeline</h2>
+                    <div class="card-body">
+                        <p><strong>Wedding Date:</strong> @Model.WeddingDate.ToString("MM/dd/yyyy")</p>
+                        @{
+                            var timelineEvents = ViewBag.TimelineEvents as List<TimelineEvent>;
+                            if (timelineEvents != null && timelineEvents.Count > 0)
+                            {
+                                <ul>
+                                    @foreach (var timelineEvent in timelineEvents)
+                                    {
+                                        <li>@timelineEvent.StartTime.ToString("hh:mm tt") - @timelineEvent.EventName</li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <p class="text-muted">No timeline events scheduled.</p>
+                            }
+                        }
+                        <div class="mt-3">
+                            <a asp-controller="Couple" asp-action="Timeline" class="btn btn-primary">Manage Timeline</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -172,25 +202,55 @@
 <style>
     .container-fluid {
         max-width: 100%;
-        padding: 15px;
+        padding: 20px; /* Balanced padding */
+        height: 100%;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
     }
 
     .card {
         background-color: #fff;
         border: 1px solid #ddd;
         border-radius: 8px;
-        padding: 15px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         margin-bottom: 20px;
+        width: 100%; /* Ensure cards take full width of their column */
     }
 
-        .card h2 {
-            font-size: 20px;
-            color: #333;
+    .card-header {
+        font-size: 20px;
+        color: #333;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #ddd;
+        padding: 10px 15px;
+        font-weight: bold;
+    }
+
+    .card-body {
+        padding: 15px;
+    }
+
+    .scrollable-card {
+        max-height: 250px;
+        overflow: hidden;
+    }
+
+        .scrollable-card .card-body {
+            max-height: 200px;
+            overflow-y: auto;
         }
 
     .row {
         margin-bottom: 20px;
+        margin-left: -10px;
+        margin-right: -10px; /* Adjust row margins to balance spacing */
+        flex: 0 0 auto; /* Prevent row from stretching */
+    }
+
+    .col-md-6 {
+        padding-left: 10px;
+        padding-right: 10px; /* Balanced padding for columns */
     }
 
     .col-sm-4 {
@@ -243,14 +303,9 @@
         border-radius: 10px;
     }
 
-    .bg-success {
-        background-color: #28a745 !important;
+    .bg-danger {
+        background-color: #dc3545 !important;
         color: #fff !important;
-    }
-
-    .bg-warning {
-        background-color: #ffc107 !important;
-        color: #333 !important;
     }
 
     .form-label {
@@ -272,13 +327,31 @@
     .mr-2 {
         margin-right: 8px;
     }
+
+    .ms-2 {
+        margin-left: 0.5rem;
+    }
+
+    .progress {
+        height: 25px;
+        border-radius: 5px;
+        background-color: #f1f1f1;
+    }
+
+    .progress-bar {
+        background-color: #28a745;
+        transition: width 0.6s ease;
+        font-size: 14px;
+        line-height: 25px;
+    }
 </style>
 
 @section Scripts {
+    @Html.AntiForgeryToken()
     @if (TempData["BudgetExceededMessage"] != null)
     {
         <script>
-                window.onload = function() {
+            window.onload = function() {
                 alert('@TempData["BudgetExceededMessage"]');
             };
         </script>

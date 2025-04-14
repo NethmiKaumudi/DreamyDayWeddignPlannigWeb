@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DreamyDayWeddingPlanningWeb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250413212019_Add")]
-    partial class Add
+    [Migration("20250414132915_add")]
+    partial class add
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -257,6 +257,9 @@ namespace DreamyDayWeddingPlanningWeb.Migrations
                         .HasColumnType("varchar(500)");
 
                     b.Property<bool>("IsApproved")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsBooked")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsDeleted")

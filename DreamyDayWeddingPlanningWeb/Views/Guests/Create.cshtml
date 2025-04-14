@@ -5,18 +5,16 @@
     Layout = "~/Views/Shared/_CoupleLayout.cshtml";
 }
 
-<h1 style="font-size: 24px; margin-bottom: 20px;">Add New Guest</h1>
+<h2 class="mb-4 mt-4 text-center" style="font-size: 24px; color: #333;">Add New Guest</h2>
 
 <div class="container-fluid">
     <div class="card">
-        <h2 class="mb-3">Create a New Guest</h2>
-        <hr class="mb-3" />
-
         <form asp-action="Create" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <input type="hidden" asp-for="WeddingId" /> <!-- Hidden field to submit WeddingId -->
             <div class="mb-3">
                 <label asp-for="WeddingId" class="form-label"></label>
-                <select asp-for="WeddingId" class="form-control" asp-items="ViewBag.WeddingId"></select>
+                <input asp-for="WeddingId" class="form-control" readonly />
                 <span asp-validation-for="WeddingId" class="text-danger"></span>
             </div>
             <div class="mb-3">
