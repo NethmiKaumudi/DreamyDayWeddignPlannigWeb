@@ -1,0 +1,196 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - DreamyDay Wedding Planning</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #A3BFFA, #E2E8F0);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .navbar {
+            background-color: #fff;
+            padding: 10px 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+        }
+
+            .navbar-actions span {
+                margin-right: 15px;
+                font-size: 16px;
+                color: #333;
+            }
+
+            .navbar-actions a {
+                color: #007bff;
+                text-decoration: none;
+                font-size: 16px;
+            }
+
+                .navbar-actions a:hover {
+                    text-decoration: underline;
+                }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 110px); /* Adjust for navbar and footer */
+            padding: 0;
+            margin: 0;
+            width: 100vw; /* Ensure container takes full viewport width */
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .sidebar-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+        }
+
+            .sidebar-nav li {
+                margin-bottom: 30px;
+            }
+
+        .sidebar-btn {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            white-space: nowrap;
+        }
+
+            .sidebar-btn i {
+                margin-right: 10px;
+            }
+
+            .sidebar-btn:hover {
+                background-color: #0056b3;
+            }
+
+        .content {
+            flex: 1;
+            padding: 0;
+            overflow-y: hidden;
+            width: calc(100% - 250px); /* Ensure it takes full width minus sidebar */
+            height: 100%;
+        }
+
+        footer {
+            text-align: center;
+            padding: 5px;
+            color: #666;
+            background-color: #fff;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Override Bootstrap's .container max-width */
+        .container {
+            max-width: 100% !important; /* Remove Bootstrap's max-width constraint */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <a asp-controller="Home" asp-action="Index" class="navbar-brand">DreamyDay</a>
+            <div class="navbar-actions">
+                <span>Welcome, @User.Identity.Name! 💑</span>
+                <a asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">Logout</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <h3 class="sidebar-title">Couple Dashboard</h3>
+            <ul class="sidebar-nav">
+                <li>
+                    <a asp-controller="Couple" asp-action="Dashboard" class="sidebar-btn">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Couple" asp-action="Checklist" class="sidebar-btn">
+                        <i class="fas fa-check-square"></i> Wedding Tasks List
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Couple" asp-action="GuestList" class="sidebar-btn">
+                        <i class="fas fa-users"></i> Guest List
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Couple" asp-action="Budget" class="sidebar-btn">
+                        <i class="fas fa-wallet"></i> Budget Tracker
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Couple" asp-action="Timeline" class="sidebar-btn">
+                        <i class="fas fa-calendar-alt"></i> Timeline
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Couple" asp-action="Vendors" class="sidebar-btn">
+                        <i class="fas fa-store"></i> Vendor Catalog
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer>
+        © 2025 DreamyDay Wedding Planning. All rights reserved.
+    </footer>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

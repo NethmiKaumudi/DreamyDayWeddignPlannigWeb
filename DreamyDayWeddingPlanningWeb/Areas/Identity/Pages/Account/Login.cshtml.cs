@@ -1,8 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-#nullable disable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -11,27 +7,30 @@ using Microsoft.AspNetCore.Authorization;
 using DreamyDayWeddingPlanningWeb.Areas.Identity.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using FluentValidation;
 
 namespace DreamyDayWeddingPlanningWeb.Areas.Identity.Pages.Account
 {
     public class LoginModel : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<LoginModel> _logger;
-        private readonly UserManager<ApplicationUser> _userManager; // Added UserManager
+        private readonly IValidator<InputModel> _validator;
 
-        // Inject UserManager into the constructor
-        public LoginModel(SignInManager<ApplicationUser> signInManager,
-                          UserManager<ApplicationUser> userManager,
-                          ILogger<LoginModel> logger)
+        public LoginModel(
+            SignInManager<ApplicationUser> signInManager,
+            UserManager<ApplicationUser> userManager,
+            ILogger<LoginModel> logger,
+            IValidator<InputModel> validator)
         {
             _signInManager = signInManager;
-            _userManager = userManager;  // Assign UserManager to the private field
+            _userManager = userManager;
             _logger = logger;
+            _validator = validator;
         }
 
         [BindProperty]
@@ -54,84 +53,105 @@ namespace DreamyDayWeddingPlanningWeb.Areas.Identity.Pages.Account
             [DataType(DataType.Password)]
             public string Password { get; set; }
 
-            [Display(Name = "Remember me?")]
+            [Display(Name = "Remember me")]
             public bool RememberMe { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
         {
-            if (!string.IsNullOrEmpty(ErrorMessage))
+            try
             {
-                ModelState.AddModelError(string.Empty, ErrorMessage);
+                if (!string.IsNullOrEmpty(ErrorMessage))
+                {
+                    ModelState.AddModelError(string.Empty, ErrorMessage);
+                }
+
+                returnUrl ??= Url.Content("~/");
+
+                await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+
+                ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+                ReturnUrl = returnUrl;
             }
-
-            returnUrl ??= Url.Content("~/");
-
-            // Clear the existing external cookie to ensure a clean login process
-            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
-
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-
-            ReturnUrl = returnUrl;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while loading the login page.");
+                ModelState.AddModelError(string.Empty, "An unexpected error occurred. Please try again later.");
+            }
         }
 
-        public async Task<IActionResult> OnPostAsync(string returnUrl = null)
+       public async Task<IActionResult> OnPostAsync(string returnUrl = null)
+{
+    returnUrl ??= Url.Content("~/");
+
+    try
+    {
+        ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+        var validationResult = await _validator.ValidateAsync(Input);
+        if (!validationResult.IsValid)
         {
-            returnUrl ??= Url.Content("~/");
-
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-
-            if (ModelState.IsValid)
+            foreach (var error in validationResult.Errors)
             {
-                // Find user by Username or Email
-                var user = await _userManager.FindByNameAsync(Input.UserName) ?? await _userManager.FindByEmailAsync(Input.UserName);
-
-                if (user != null)
-                {
-                    // Check user role and redirect accordingly
-                    var roles = await _userManager.GetRolesAsync(user);
-                    if (roles.Contains("Admin"))
-                    {
-                        // If admin, redirect to Admin dashboard
-                        return RedirectToAction("AdminDashboard", "Admin");
-                    }
-                    else if (roles.Contains("Planner"))
-                    {
-                        // If planner, redirect to Planner dashboard
-                        return RedirectToAction("PlannerDashboard", "Planner");
-                    }
-                    else if (roles.Contains("Couple"))
-                    {
-                        // If couple, redirect to Couple dashboard
-                        return RedirectToAction("CoupleDashboard", "Couple");
-                    }
-                }
-
-                // Default password sign-in logic
-                var result = await _signInManager.PasswordSignInAsync(Input.UserName, Input.Password, Input.RememberMe, lockoutOnFailure: false);
-                if (result.Succeeded)
-                {
-                    _logger.LogInformation("User logged in.");
-                    return LocalRedirect(returnUrl);
-                }
-                if (result.RequiresTwoFactor)
-                {
-                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
-                }
-                if (result.IsLockedOut)
-                {
-                    _logger.LogWarning("User account locked out.");
-                    return RedirectToPage("./Lockout");
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    return Page();
-                }
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
             }
-
-            // If we got this far, something failed, redisplay form
             return Page();
         }
+
+        var user = await _userManager.FindByNameAsync(Input.UserName);
+        if (user == null)
+        {
+            _logger.LogWarning($"User {Input.UserName} not found.");
+            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+            return Page();
+        }
+
+        _logger.LogInformation($"Attempting login for user {Input.UserName}. EmailConfirmed: {user.EmailConfirmed}");
+
+        var result = await _signInManager.PasswordSignInAsync(Input.UserName, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+        if (result.Succeeded)
+        {
+            _logger.LogInformation("User logged in.");
+            var roles = await _userManager.GetRolesAsync(user);
+            _logger.LogInformation($"Roles for user {Input.UserName}: {string.Join(", ", roles)}");
+            if (roles.Contains("Admin"))
+            {
+                return RedirectToAction("AdminDashboard", "Admin");
+            }
+            else if (roles.Contains("Planner"))
+            {
+                return RedirectToAction("PlannerDashboard", "Planner");
+            }
+            else if (roles.Contains("Couple"))
+            {
+                        return RedirectToAction("Dashboard", "Couple");
+                    }
+            return LocalRedirect(returnUrl);
+        }
+        if (result.RequiresTwoFactor)
+        {
+            _logger.LogInformation("Two-factor authentication required.");
+            return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
+        }
+        if (result.IsLockedOut)
+        {
+            _logger.LogWarning("User account locked out.");
+            return RedirectToPage("./Lockout");
+        }
+        else
+        {
+            _logger.LogWarning($"Login failed for user {Input.UserName}.");
+            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+            return Page();
+        }
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "An error occurred during login.");
+        ModelState.AddModelError(string.Empty, "An unexpected error occurred during login. Please try again later.");
+        return Page();
+    }
+}
     }
 }

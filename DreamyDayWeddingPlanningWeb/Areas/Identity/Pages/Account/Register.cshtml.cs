@@ -1,24 +1,18 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-#nullable disable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using DreamyDayWeddingPlanningWeb.Areas.Identity.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using DreamyDayWeddingPlanningWeb.Areas.Identity.Data;
 
 namespace DreamyDayWeddingPlanningWeb.Areas.Identity.Pages.Account
 {
@@ -27,7 +21,6 @@ namespace DreamyDayWeddingPlanningWeb.Areas.Identity.Pages.Account
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUserStore<ApplicationUser> _userStore;
-        private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
 
@@ -40,7 +33,6 @@ namespace DreamyDayWeddingPlanningWeb.Areas.Identity.Pages.Account
         {
             _userManager = userManager;
             _userStore = userStore;
-            _emailStore = GetEmailStore();
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
@@ -60,6 +52,11 @@ namespace DreamyDayWeddingPlanningWeb.Areas.Identity.Pages.Account
             public string Username { get; set; }
 
             [Required]
+            [EmailAddress(ErrorMessage = "Invalid email address.")]
+            [Display(Name = "Email")]
+            public string Email { get; set; }
+
+            [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
@@ -73,6 +70,11 @@ namespace DreamyDayWeddingPlanningWeb.Areas.Identity.Pages.Account
             [Required]
             [Display(Name = "Role")]
             public string Role { get; set; }
+
+            [Required]
+            [Display(Name = "Contact Number")]
+            [Phone(ErrorMessage = "Invalid phone number.")]
+            public string ContactNumber { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -89,10 +91,10 @@ namespace DreamyDayWeddingPlanningWeb.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
 
-                // Set the username (no email since it's not required)
+                // Set the username, email, and contact number
                 await _userStore.SetUserNameAsync(user, Input.Username, CancellationToken.None);
-
-                // Set the custom Role property (from ApplicationUser)
+                await GetEmailStore().SetEmailAsync(user, Input.Email, CancellationToken.None);
+                user.ContactNumber = Input.ContactNumber;
                 user.Role = Input.Role;
 
                 // Create the user with the provided password
@@ -105,13 +107,24 @@ namespace DreamyDayWeddingPlanningWeb.Areas.Identity.Pages.Account
                     // Assign the role to the user using Identity's role management
                     await _userManager.AddToRoleAsync(user, Input.Role);
 
-                    // Since email confirmation is not needed, we can skip that part
-                    // Check if confirmed account is required (though we don't have email, so we'll bypass this)
+                    // Generate an email confirmation token
+                    var userId = await _userManager.GetUserIdAsync(user);
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    var callbackUrl = Url.Page(
+                        "/Account/ConfirmEmail",
+                        pageHandler: null,
+                        values: new { userId = userId, code = code, returnUrl = returnUrl },
+                        protocol: Request.Scheme);
+
+                    // Send the confirmation email
+                    await _emailSender.SendEmailAsync(
+                        Input.Email,
+                        "Confirm your email",
+                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
-                        // If confirmation is required but email is not used, you might want to disable this in Program.cs
-                        // For now, we'll redirect to a confirmation page without email
-                        return RedirectToPage("RegisterConfirmation", new { returnUrl = returnUrl });
+                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
                     }
                     else
                     {

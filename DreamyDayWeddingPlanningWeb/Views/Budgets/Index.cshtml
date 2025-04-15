@@ -1,0 +1,270 @@
+﻿@model IEnumerable<DreamyDayWeddingPlanningWeb.Models.Budget>
+
+@{
+    ViewData["Title"] = "Budget Tracker";
+    Layout = "~/Views/Shared/_CoupleLayout.cshtml";
+}
+
+<h2 class="mb-3 mt-3 ms-3 font-add font-16">Budget Tracker</h2>
+
+<div class="container-fluid">
+    <div class="card">
+        <!-- Budget Summary and Pie Chart -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                @{
+                    var totalAllocated = (decimal)ViewBag.TotalBudget; // Use the wedding's total budget
+                    var totalSpent = Model.Sum(b => b.SpentAmount);
+                    var remaining = totalAllocated - totalSpent;
+                }
+                <p><strong>Total Allocated:</strong> Rs @totalAllocated.ToString("N2")</p>
+                <p><strong>Total Spent:</strong> Rs @totalSpent.ToString("N2")</p>
+                <p><strong>Remaining:</strong> Rs @remaining.ToString("N2")</p>
+            </div>
+            <div class="col-md-6">
+                <div style="max-width: 200px; margin: 0 auto;">
+                    <canvas id="budgetChart" style="max-height: 200px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add New Budget Item Button -->
+        <div class="row mb-3">
+            <div class="col-md-12 text-md-end">
+                <a asp-action="Create" asp-route-weddingId="@ViewBag.WeddingId" class="btn btn-primary">Add New Budget Item</a>
+            </div>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <p class="text-muted">No budget items found. Start by adding a new budget item!</p>
+        }
+        else
+        {
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Category</th>
+                        <th>Allocated Amount</th>
+                        <th>Spent Amount</th>
+                        <th>Remaining</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => item.Category)</td>
+                            <td>Rs @item.AllocatedAmount.ToString("N2")</td>
+                            <td>Rs @item.SpentAmount.ToString("N2")</td>
+                            <td>Rs @((item.AllocatedAmount - item.SpentAmount).ToString("N2"))</td>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary"> Edit</a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info">Details</a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger"> Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container">
+    <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">DreamyDay</strong>
+        </div>
+        <div class="toast-body">
+            <span id="toastMessage"></span>
+            <button type="button" class="btn btn-primary btn-sm mt-2" onclick="hideToast()">OK</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .container-fluid {
+        max-width: 100%;
+        height: calc(100vh - 120px);
+        overflow-y: auto;
+        padding: 15px;
+    }
+
+    .card {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .row.mb-3 {
+        margin-bottom: 20px !important;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        padding: 8px 16px;
+        color: #fff;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+    .table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 14px;
+    }
+
+        .table th, .table td {
+            padding: 12px 8px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .table thead {
+            background-color: #343a40;
+            color: #fff;
+        }
+
+        .table tbody tr {
+            background-color: #fff;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+    .action-link {
+        color: #007bff;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+        .action-link.text-danger {
+            color: #dc3545;
+        }
+
+        .action-link:hover {
+            text-decoration: underline;
+        }
+
+    .text-muted {
+        font-size: 14px;
+    }
+
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1050;
+    }
+
+    .toast {
+        display: none;
+        min-width: 200px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+        .toast.show {
+            display: block;
+        }
+
+    .toast-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #ddd;
+        padding: 8px 12px;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .toast-body {
+        padding: 12px;
+        font-size: 13px;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+        .toast-body .btn {
+            margin-top: 8px;
+            padding: 4px 12px;
+            font-size: 13px;
+        }
+</style>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function showToast(message) {
+            const toast = document.getElementById('notificationToast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+        }
+
+        function hideToast() {
+            const toast = document.getElementById('notificationToast');
+            toast.classList.remove('show');
+        }
+
+        window.onload = function () {
+            @if (TempData["SuccessMessage"] != null)
+            {
+                @: showToast('@TempData["SuccessMessage"]');
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                @: showToast('@TempData["ErrorMessage"]');
+            }
+
+            // Initialize Pie Chart
+            const ctx = document.getElementById('budgetChart').getContext('2d');
+            const totalSpent = @totalSpent;
+            const remaining = @remaining;
+
+new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Spent', 'Remaining'],
+                    datasets: [{
+                        data: [totalSpent, remaining],
+                        backgroundColor: ['#dc3545', '#28a745'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Budget vs. Spent',
+                            font: {
+                                size: 14
+                            }
+                        }
+                    }
+                }
+            });
+        };
+    </script>
+}

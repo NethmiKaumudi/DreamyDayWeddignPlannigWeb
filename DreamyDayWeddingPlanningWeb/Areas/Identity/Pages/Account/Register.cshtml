@@ -1,88 +1,273 @@
 ﻿@page
 @model RegisterModel
+
 @{
     ViewData["Title"] = "Register";
 }
 
-<h1>@ViewData["Title"]</h1>
+<style>
+    /* General styling */
+    html, body {
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background-color: #ffffff;
+        overflow-x: hidden;
+        overflow-y: hidden;
+    }
 
-<div class="row">
-    <div class="col-md-4">
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <h2>Create a new account.</h2>
-            <hr />
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+    /* Main container with split layout */
+    .main-container {
+        display: flex;
+        height: calc(100vh - 140px);
+        align-items: stretch;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
 
-            <!-- Username Field -->
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Username" class="form-control" autocomplete="username" aria-required="true" placeholder="username" />
-                <label asp-for="Input.Username">Username</label>
-                <span asp-validation-for="Input.Username" class="text-danger"></span>
-            </div>
+    /* Left side with blue background */
+    .left-section {
+        flex: 0 0 50%;
+        background: linear-gradient(to bottom, #4a90e2, #0056b3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        position: relative;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+    }
 
-            <!-- Password Field -->
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.Password">Password</label>
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
-            </div>
+    .left-section h1 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
 
-            <!-- Confirm Password Field -->
-            <div class="form-floating mb-3">
-                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-            </div>
+    .left-section p {
+        font-size: 1rem;
+        opacity: 0.8;
+    }
 
-            <!-- Role Dropdown -->
-            <div class="form-floating mb-3">
-                <select asp-for="Input.Role" class="form-select" aria-required="true">
-                    <option value="" disabled selected>Select your role</option>
-                    <option value="Admin">Admin</option>
-                    <option value="Planner">Planner</option>
-                    <option value="Couple">Couple</option>
-                </select>
-                <label asp-for="Input.Role">Role</label>
-                <span asp-validation-for="Input.Role" class="text-danger"></span>
-            </div>
+    /* Decorative wave effect */
+    .left-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.1)" fill-opacity="1" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,138.7C672,128,768,160,864,181.3C960,203,1056,213,1152,197.3C1248,181,1344,139,1392,117.3L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+        background-size: cover;
+    }
 
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
-        </form>
+    /* Right side with register form */
+    .right-section {
+        flex: 0 0 50%;
+        background-color: #ffffff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+        padding: 0;
+        overflow-y: auto;
+    }
+
+    .register-container {
+        width: 100%;
+        max-width: 400px;
+        padding: 15px;
+    }
+
+    .register-container h2 {
+        font-size: 1.5rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+
+    .register-form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .form-group {
+        text-align: left;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        font-size: 0.9rem;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: #2A5298;
+        box-shadow: 0 0 5px rgba(42, 82, 152, 0.3);
+    }
+
+    /* Password toggle button */
+    .form-group.position-relative {
+        position: relative;
+    }
+
+    .form-group .toggle-password {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        background: none;
+        padding: 0;
+        cursor: pointer;
+    }
+
+    /* Register button */
+    .btn-primary {
+        background-color: #0056b3;
+        border: none;
+        border-radius: 5px;
+        padding: 0.75rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #ffffff;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #1A3C78;
+    }
+
+    /* Links */
+    .links {
+        margin-top: 0.5rem;
+        text-align: center;
+    }
+
+    .links p {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin: 0.25rem 0;
+    }
+
+    .links a {
+        color: #2A5298;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .links a:hover {
+        text-decoration: underline;
+        color: #1A3C78;
+    }
+
+   
+    
+</style>
+
+<!-- Main content with split layout -->
+<div class="main-container">
+    <!-- Left section with gradient background -->
+    <div class="left-section">
+        <div>
+            <h1>Welcome to DreamyDay</h1>
+            <p>Register to start planning your perfect wedding.</p>
+        </div>
     </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to register.</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">
-                                article
-                                about setting up this ASP.NET application to support logging in via external services
-                            </a>.
-                        </p>
-                    </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
-                        </div>
-                    </form>
-                }
-            }
-        </section>
+
+    <!-- Right section with register form -->
+    <div class="right-section">
+        <div class="register-container">
+            <h2>Create a new account</h2>
+            <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="register-form">
+                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+                <!-- Username Field -->
+                <div class="form-group">
+                    <label asp-for="Input.Username">Username</label>
+                    <input asp-for="Input.Username" class="form-control" autocomplete="username" aria-required="true" />
+                    <span asp-validation-for="Input.Username" class="text-danger"></span>
+                </div>
+
+                <!-- Email Field -->
+<div class="form-group">
+    <label asp-for="Input.Email">Email</label>
+    <input asp-for="Input.Email" class="form-control" autocomplete="email" aria-required="true" />
+    <span asp-validation-for="Input.Email" class="text-danger"></span>
+</div>
+                <div class="form-group">
+                    <label asp-for="Input.ContactNumber">Contact Number</label>
+                    <input asp-for="Input.ContactNumber" class="form-control" autocomplete="tel" aria-required="true" />
+                    <span asp-validation-for="Input.ContactNumber" class="text-danger"></span>
+                </div>
+                <!-- Password Field with Show/Hide -->
+                <div class="form-group position-relative">
+                    <label asp-for="Input.Password">Password</label>
+                    <input asp-for="Input.Password" type="password" class="form-control" id="passwordInput" autocomplete="new-password" aria-required="true" />
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    <button type="button" class="toggle-password" onclick="togglePassword()">
+                        <i id="passwordIcon" class="bi bi-eye-slash"></i>
+                    </button>
+                </div>
+
+                <!-- Confirm Password Field -->
+                <div class="form-group">
+                    <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+                    <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" />
+                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                <!-- Role Field -->
+                <div class="form-group">
+                    <label asp-for="Input.Role">Role</label>
+                    <input asp-for="Input.Role" class="form-control" aria-required="true" />
+                    <span asp-validation-for="Input.Role" class="text-danger"></span>
+                </div>
+
+                <!-- Register Button -->
+                <div>
+                    <button id="registerSubmit" type="submit" class="w-100 btn btn-primary">Register</button>
+                </div>
+
+                <!-- Links -->
+                <div class="links">
+                    <p>
+                        Already have an account? <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">Sign In</a>
+                    </p>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        function togglePassword() {
+            var passwordInput = document.getElementById("passwordInput");
+            var passwordIcon = document.getElementById("passwordIcon");
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                passwordIcon.classList.remove("bi-eye-slash");
+                passwordIcon.classList.add("bi-eye");
+            } else {
+                passwordInput.type = "password";
+                passwordIcon.classList.remove("bi-eye");
+                passwordIcon.classList.add("bi-eye-slash");
+            }
+        }
+    </script>
 }

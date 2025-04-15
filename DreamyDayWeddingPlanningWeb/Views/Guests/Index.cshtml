@@ -1,0 +1,298 @@
+﻿@model IEnumerable<DreamyDayWeddingPlanningWeb.Models.Guest>
+
+@{
+    ViewData["Title"] = "Guest List";
+    Layout = "~/Views/Shared/_CoupleLayout.cshtml";
+}
+
+<h2 class="mb-4 mt-4 text-center" style="font-size: 24px; color: #333;">Guest List</h2>
+
+<div class="container-fluid">
+    <div class="card">
+        <h2 class="mb-3">Your Wedding Guests</h2>
+        <hr class="mb-3" />
+
+        <div class="row mb-3 align-items-center">
+            <div class="col-md-3 col-sm-6">
+                <form asp-action="Index" method="get">
+                    <div class="form-group">
+                        <label for="rsvpFilter" class="form-label">Filter by RSVP Status:</label>
+                        <select id="rsvpFilter" name="rsvpFilter" class="form-control rsvp-filter" onchange="this.form.submit()">
+                            <option value="All">All</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-9 col-sm-6 text-md-end text-sm-start mt-sm-0 mt-2">
+                <a asp-action="Create" class="btn btn-primary">Add New Guest</a>
+            </div>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <p class="text-muted">No guests found. Start by adding a new guest!</p>
+        }
+        else
+        {
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.Name)</th>
+                        <th>RSVP Status</th>
+                        <th>@Html.DisplayNameFor(model => model.MealPreference)</th>
+                        <th>@Html.DisplayNameFor(model => model.SeatingArrangement)</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                            <td>
+                                @if (item.HasRSVPed)
+                                {
+                                    <span class="badge bg-success">Yes</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">No</span>
+                                }
+                            </td>
+                            <td>@Html.DisplayFor(modelItem => item.MealPreference)</td>
+                            <td>@Html.DisplayFor(modelItem => item.SeatingArrangement)</td>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info">Details</a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container">
+    <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">DreamyDay</strong>
+        </div>
+        <div class="toast-body">
+            <span id="toastMessage"></span>
+            <button type="button" class="btn btn-primary btn-sm mt-2" onclick="hideToast()">OK</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .container-fluid {
+        max-width: 100%;
+        height: calc(100vh - 120px);
+        overflow-y: auto;
+        padding: 15px;
+    }
+
+    .card {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+        .card h2 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+    hr.mb-3 {
+        margin-bottom: 10px !important;
+    }
+
+    .row.mb-3 {
+        margin-bottom: 10px !important;
+    }
+
+    .form-label {
+        font-weight: bold;
+        color: #333;
+        font-size: 14px;
+    }
+
+    .form-control.rsvp-filter {
+        width: 150px;
+        padding: 6px;
+        font-size: 14px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        padding: 6px 12px;
+        color: #fff;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+    .table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 10px;
+        font-size: 14px;
+    }
+
+        .table th, .table td {
+            padding: 12px 8px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .table tbody tr {
+            background-color: #fff;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+    .table-dark {
+        background-color: #343a40;
+        color: #fff;
+    }
+
+    .badge {
+        padding: 4px 8px;
+        border-radius: 10px;
+        font-size: 0.8em;
+    }
+
+    .bg-success {
+        background-color: #28a745 !important;
+        color: #fff !important;
+    }
+
+    .bg-warning {
+        background-color: #ffc107 !important;
+        color: #333 !important;
+    }
+
+    .btn-outline-primary {
+        border-color: #007bff;
+        color: #007bff;
+        padding: 4px 8px;
+        font-size: 0.9em;
+    }
+
+        .btn-outline-primary:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+    .btn-outline-info {
+        border-color: #17a2b8;
+        color: #17a2b8;
+        padding: 4px 8px;
+        font-size: 0.9em;
+    }
+
+        .btn-outline-info:hover {
+            background-color: #17a2b8;
+            color: #fff;
+        }
+
+    .btn-outline-danger {
+        border-color: #dc3545;
+        color: #dc3545;
+        padding: 4px 8px;
+        font-size: 0.9em;
+    }
+
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+    .text-muted {
+        font-size: 14px;
+    }
+
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1050;
+    }
+
+    .toast {
+        display: none;
+        min-width: 200px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+        .toast.show {
+            display: block;
+        }
+
+    .toast-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #ddd;
+        padding: 8px 12px;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .toast-body {
+        padding: 12px;
+        font-size: 13px;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+        .toast-body .btn {
+            margin-top: 8px;
+            padding: 4px 12px;
+            font-size: 13px;
+        }
+</style>
+
+@section Scripts {
+    <script>
+        function showToast(message) {
+            const toast = document.getElementById('notificationToast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+        }
+
+        function hideToast() {
+            const toast = document.getElementById('notificationToast');
+            toast.classList.remove('show');
+        }
+
+        window.onload = function () {
+        @if (TempData["SuccessMessage"] != null)
+        {
+            @: showToast('@TempData["SuccessMessage"]');
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            @: showToast('@TempData["ErrorMessage"]');
+        }
+
+                    const rsvpFilter = '@ViewData["RSVPFilter"]';
+                    document.getElementById('rsvpFilter').value = rsvpFilter || 'All';
+                };
+    </script>
+}

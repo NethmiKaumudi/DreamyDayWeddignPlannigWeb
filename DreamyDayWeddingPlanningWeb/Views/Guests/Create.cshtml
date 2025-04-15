@@ -1,0 +1,121 @@
+﻿@model DreamyDayWeddingPlanningWeb.Models.Guest
+
+@{
+    ViewData["Title"] = "Add New Guest";
+    Layout = "~/Views/Shared/_CoupleLayout.cshtml";
+}
+
+<h2 class="mb-4 mt-4 text-center" style="font-size: 24px; color: #333;">Add New Guest</h2>
+
+<div class="container-fluid">
+    <div class="card">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <input type="hidden" asp-for="WeddingId" /> <!-- Hidden field to submit WeddingId -->
+            <div class="mb-3">
+                <label asp-for="WeddingId" class="form-label"></label>
+                <input asp-for="WeddingId" class="form-control" readonly />
+                <span asp-validation-for="WeddingId" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" placeholder="Enter guest name" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="mb-3 form-check">
+                <input class="form-check-input" asp-for="HasRSVPed" />
+                <label class="form-check-label" for="HasRSVPed">RSVP Status</label>
+            </div>
+            <div class="mb-3">
+                <label asp-for="MealPreference" class="form-label"></label>
+                <select asp-for="MealPreference" class="form-control" asp-items="ViewBag.MealTypes">
+                    <option value="">Select a meal preference</option>
+                </select>
+                <span asp-validation-for="MealPreference" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="SeatingArrangement" class="form-label"></label>
+                <input asp-for="SeatingArrangement" class="form-control" placeholder="e.g., Table 1" />
+                <span asp-validation-for="SeatingArrangement" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary">Create</button>
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .container-fluid {
+        max-width: 100%;
+        height: calc(100vh - 120px);
+        overflow-y: auto;
+    }
+
+    .card {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+        .card h2 {
+            font-size: 20px;
+            color: #333;
+        }
+
+    .form-label {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    .mb-3 {
+        margin-bottom: 15px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        padding: 8px 15px;
+        color: #fff;
+        border-radius: 5px;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border: none;
+        padding: 8px 15px;
+        color: #fff;
+        border-radius: 5px;
+        margin-left: 10px;
+    }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+    .text-danger {
+        font-size: 0.9em;
+    }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
