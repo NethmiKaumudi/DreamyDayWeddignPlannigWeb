@@ -24,8 +24,8 @@ namespace DreamyDayWeddingPlanningWeb.Models
         [StringLength(200)]
         public string Reviews { get; set; } // JSON or comma-separated reviews
 
-        //public int? WeddingId { get; set; }
-        //public Wedding? Wedding { get; set; }
+        public int? WeddingId { get; set; }
+        public Wedding? Wedding { get; set; }
         public bool IsBooked { get; set; } = false;
 
         public bool IsDeleted { get; set; } = false;
