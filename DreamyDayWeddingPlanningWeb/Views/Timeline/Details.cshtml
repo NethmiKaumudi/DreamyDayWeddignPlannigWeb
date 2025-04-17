@@ -17,14 +17,13 @@
         }
         else
         {
-            <h2 class="mb-4 mt-4 text-center" style="font-size: 20px; color: #333;">Timeline Event Details</h2>
-            <hr class="mb-3" />
+            <h2 class="mb-1 mt-2 text-center" style="font-size: 20px; color: #333;">Timeline Event Details</h2>
+            <hr class="mb-2" />
 
             <dl class="row">
-                <dt class="col-sm-3">Wedding ID</dt>
-                <dd class="col-sm-9">
-                    <input type="text" class="form-control" value="@ViewBag.WeddingId" readonly />
-                </dd>
+               
+               <dt class="col-sm-3">@Html.DisplayNameFor(model => model.WeddingId)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.WeddingId)</dd>
                 <dt class="col-sm-3">@Html.DisplayNameFor(model => model.EventName)</dt>
                 <dd class="col-sm-9">@Html.DisplayFor(model => model.EventName)</dd>
                 <dt class="col-sm-3">@Html.DisplayNameFor(model => model.StartTime)</dt>
@@ -33,8 +32,7 @@
                 <dd class="col-sm-9">@Model.EndTime.ToString("hh:mm tt, MMM dd, yyyy")</dd>
                 <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Description)</dt>
                 <dd class="col-sm-9">@Html.DisplayFor(model => model.Description)</dd>
-                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.IsDeleted)</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.IsDeleted)</dd>
+               
             </dl>
 
             <div>

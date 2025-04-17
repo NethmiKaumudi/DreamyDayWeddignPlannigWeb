@@ -65,13 +65,13 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .WithMany()
             .HasForeignKey(te => te.WeddingId);
 
-        //builder.Entity<Vendor>()
-        //    .HasOne(v => v.Wedding)
-        //    .WithMany()
-        //    .HasForeignKey(v => v.WeddingId)
-        //    .IsRequired(false);
+        builder.Entity<Vendor>()
+            .HasOne(v => v.Wedding)
+            .WithMany()
+            .HasForeignKey(v => v.WeddingId)
+            .IsRequired(false);
 
-      
+
 
         builder.Entity<ActivityLog>()
             .HasOne(al => al.User)
