@@ -1,0 +1,13 @@
+﻿<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+    <div class="container-fluid">
+        <span class="navbar-brand">DreamyDay Planner</span>
+        <div class="ml-auto d-flex align-items-center">
+            @Html.Partial("~/Views/Planner/Partials/_Notifications.cshtml")
+            @Html.Partial("~/Views/Planner/Partials/_Messages.cshtml")
+            <a href="/Identity/Account/Manage" class="btn btn-outline-primary btn-sm mx-2">Profile</a>
+            <form method="post" asp-area="Identity" asp-page="/Account/Logout">
+                <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>
+            </form>
+        </div>
+    </div>
+</nav>

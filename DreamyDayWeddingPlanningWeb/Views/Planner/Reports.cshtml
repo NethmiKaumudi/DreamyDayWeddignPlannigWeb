@@ -1,0 +1,68 @@
+﻿@{
+    ViewBag.Title = "Reports";
+    var weddings = ViewBag.Weddings as List<DreamyDayWeddingPlanningWeb.Models.Wedding>;
+}
+
+<h2 class="mb-4">📊 Generate Wedding Reports</h2>
+
+<form method="post" action="/Planner/GenerateReport" target="_blank">
+    <div class="form-group">
+        <label for="weddingId">Select Wedding:</label>
+        <select class="form-control" name="weddingId" required>
+            <option value="">-- Choose --</option>
+            @foreach (var wedding in weddings)
+            {
+                <option value="@wedding.Id">@wedding.WeddingTitle</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="reportType">Report Type:</label>
+        <select class="form-control" name="reportType" required>
+            <option value="summary">Summary</option>
+            <option value="tasks">Tasks</option>
+            <option value="vendors">Vendors</option>
+            <option value="full">Full Report</option>
+        </select>
+    </div>
+    <script>
+        function viewReport() {
+            var weddingId = $('#weddingSelect').val();
+            var reportType = 'view';
+
+            $.post('/Planner/GenerateReport', { weddingId: weddingId, reportType: reportType }, function (html) {
+                $('#reportModalBody').html(html);
+                $('#reportModal').modal('show');
+            });
+        }
+
+        function downloadReport() {
+            var weddingId = $('#weddingSelect').val();
+            var form = $('<form method="post" action="/Planner/GenerateReport"></form>');
+            form.append('<input type="hidden" name="weddingId" value="' + weddingId + '"/>');
+            form.append('<input type="hidden" name="reportType" value="download"/>');
+            $('body').append(form);
+            form.submit();
+            form.remove();
+        }
+    </script>
+
+    <!-- Modal HTML -->
+    <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Wedding Report</h4>
+                    <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body" id="reportModalBody">
+                    <!-- Filled dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-primary mt-3">📄 View Report</button>
+    <button class="btn btn-success mt-3" formaction="/Planner/GenerateReport?download=true" formtarget="_blank">⬇ Download PDF</button>
+</form>

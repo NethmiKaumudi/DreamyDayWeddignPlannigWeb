@@ -1,0 +1,60 @@
+﻿
+
+@model DreamyDayWeddingPlanningWeb.Models.Planner.WeddingReportViewModel
+
+<div>
+    <h3>@Model.WeddingTitle (@Model.WeddingDate.ToShortDateString())</h3>
+    <p><strong>Planner:</strong> @Model.PlannerName</p>
+    <p><strong>Status:</strong> @(Model.IsCompleted ? "✅ Completed" : "🕒 Ongoing")</p>
+    <p><strong>Total Budget:</strong> $@Model.Budget.ToString("F2")</p>
+
+    <hr />
+    <h5>Vendors</h5>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Priority</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var vendor in Model.Vendors)
+            {
+                <tr>
+                    <td>@vendor.Name</td>
+                    <td>@vendor.Category</td>
+                    <td>$@vendor.Price.ToString("F2")</td>
+                    <td>@vendor.Priority</td>
+                    <td>@vendor.Notes</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <hr />
+    <h5>Tasks</h5>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Task</th>
+                <th>Deadline</th>
+                <th>Status</th>
+                <th>Assigned To</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var task in Model.Tasks)
+            {
+                <tr>
+                    <td>@task.TaskName</td>
+                    <td>@task.Deadline.ToShortDateString()</td>
+                    <td>@(task.IsCompleted ? "✅" : "🕒")</td>
+                    <td>@task.AssignedUserName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

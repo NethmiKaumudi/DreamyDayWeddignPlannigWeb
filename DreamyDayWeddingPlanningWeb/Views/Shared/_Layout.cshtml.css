@@ -10,6 +10,19 @@ a.navbar-brand {
 a {
   color: #0077cc;
 }
+body {
+    background-color: #0b1f3a; /* Dark blue base */
+    color: #ffffff;
+}
+
+.card {
+    border-radius: 8px;
+}
+
+    .card .btn-primary {
+        background-color: #1e3d59;
+        border-color: #1e3d59;
+    }
 
 .btn-primary {
   color: #fff;

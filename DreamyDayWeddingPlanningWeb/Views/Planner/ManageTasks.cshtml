@@ -1,0 +1,122 @@
+﻿@using DreamyDayWeddingPlanningWeb.Areas.Identity.Data
+@model List<DreamyDayWeddingPlanningWeb.Models.Planner.TaskViewModel>
+
+@{
+    ViewBag.Title = "Manage Tasks";
+    var weddings = ViewBag.Weddings as List<DreamyDayWeddingPlanningWeb.Models.Wedding>;
+    var users = ViewBag.Users as List<DreamyDayWeddingPlanningWeb.Areas.Identity.Data.ApplicationUser>;
+}
+
+<h2 class="mb-4">Manage Wedding Tasks</h2>
+
+<button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addTaskModal">➕ Add Task</button>
+
+<table class="table table-bordered table-striped table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Task</th>
+            <th>Deadline</th>
+            <th>Status</th>
+            <th>Wedding</th>
+            <th>Assigned To</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var task in Model)
+        {
+            <tr>
+                <td>@task.TaskName</td>
+                <td>@task.Deadline.ToShortDateString()</td>
+                <td>
+                    @if (task.IsCompleted)
+                    {
+                        <span class="badge bg-success">Completed</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">Ongoing</span>
+                    }
+                </td>
+                <td>@task.WeddingName</td>
+                <td>@task.AssignedUserName</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-info toggle-status" data-id="@task.Id">Toggle Status</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Modal: Add Task -->
+<div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="addTaskForm">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addTaskModalLabel">Add New Task</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Task Name</label>
+                        <input type="text" name="TaskName" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Deadline</label>
+                        <input type="date" name="Deadline" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Wedding</label>
+                        <select name="WeddingId" class="form-select" required>
+                            <option value="">Select</option>
+                            @foreach (var w in weddings)
+                            {
+                                <option value="@w.Id">@w.WeddingTitle</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Assign To</label>
+                        <select name="AssignedToUserId" class="form-select" required>
+                            <option value="">Select</option>
+                            @foreach (var u in users)
+                            {
+                                <option value="@u.Id">@u.UserName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $('#addTaskForm').on('submit', function (e) {
+            e.preventDefault();
+            $.ajax({
+                url: '/Planner/AddTask',
+                method: 'POST',
+                data: $(this).serialize(),
+                success: function () {
+                    location.reload();
+                },
+                error: function () {
+                    alert('Failed to add task.');
+                }
+            });
+        });
+
+        $('.toggle-status').click(function () {
+            const taskId = $(this).data('id');
+            $.post('/Planner/ToggleTaskStatus', { id: taskId }, function () {
+                location.reload();
+            });
+        });
+    </script>
+}

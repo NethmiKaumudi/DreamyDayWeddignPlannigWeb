@@ -1,7 +1,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 using DreamyDayWeddingPlanningWeb.Data;
+using DreamyDayWeddingPlanningWeb.Models;
 using DreamyDayWeddingPlanningWeb.Areas.Identity.Data;
+<<<<<<< Updated upstream
 using FluentValidation.AspNetCore;
 using DreamyDayWeddingPlanningWeb.Business.Interfaces;
 using DreamyDayWeddingPlanningWeb.Services;
@@ -9,11 +13,17 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using DreamyDayWeddingPlanningWeb.Models.Validators;
 using FluentValidation;
 using DreamyDayWeddingPlanningWeb.Business.Services;
+=======
+using DreamyDayWeddingPlanningWeb.Services;
+
+>>>>>>> Stashed changes
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection") ?? throw new InvalidOperationException("Connection string 'ApplicationDbContextConnection' not found.");
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+// ------------------------------------------------------
+// ✅ Configure Services
+// ------------------------------------------------------
 
+<<<<<<< Updated upstream
 // Register EmailSettings
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
@@ -32,9 +42,30 @@ builder.Services.AddValidatorsFromAssemblyContaining<GuestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<BudgetValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<TimelineEventValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<VendorValidator>();
+=======
+// 🔌 Database: MySQL with EF Core
+var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection")
+    ?? throw new InvalidOperationException("Connection string 'ApplicationDbContextConnection' not found.");
 
-// Add services to the container.
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+>>>>>>> Stashed changes
+
+// 👤 Identity with Roles
+builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false;
+})
+.AddRoles<IdentityRole>()
+.AddEntityFrameworkStores<ApplicationDbContext>();
+
+// 📄 PDF & View Rendering Services
+builder.Services.AddSingleton<IConverter>(new SynchronizedConverter(new PdfTools()));
+builder.Services.AddScoped<IViewRenderService, ViewRenderService>();
+
+// 🌐 MVC + Razor Pages
 builder.Services.AddControllersWithViews();
+<<<<<<< Updated upstream
 builder.Services.AddScoped<IWeddingTaskService, WeddingTaskService>();
 builder.Services.AddScoped<IWeddingService, WeddingService>();
 builder.Services.AddScoped<IGuestService, GuestService>();
@@ -44,45 +75,58 @@ builder.Services.AddScoped<IWeddingTimeLineService, WeddingTimeLineService>();
 
 
 
+=======
+builder.Services.AddRazorPages();
+>>>>>>> Stashed changes
 
+// ------------------------------------------------------
+// ✅ Build App
+// ------------------------------------------------------
 var app = builder.Build();
-// 👇 Add this after app.Build()
+
+// ------------------------------------------------------
+// ✅ Seed Roles
+// ------------------------------------------------------
 using (var scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
-    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     string[] roles = { "Admin", "Planner", "Couple" };
 
     foreach (var role in roles)
     {
-        var roleExist = await roleManager.RoleExistsAsync(role);
-        if (!roleExist)
+        if (!await roleManager.RoleExistsAsync(role))
         {
             await roleManager.CreateAsync(new IdentityRole(role));
         }
     }
 }
 
-
-// Configure the HTTP request pipeline.
+// ------------------------------------------------------
+// ✅ Middleware Pipeline
+// ------------------------------------------------------
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
+// ------------------------------------------------------
+// ✅ Routing
+// ------------------------------------------------------
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Planner}/{action=Dashboard}/{id?}");
 
-app.MapRazorPages();
+app.MapRazorPages(); // Required for Identity UI
 
+// ------------------------------------------------------
+// ✅ Run Application
+// ------------------------------------------------------
 app.Run();

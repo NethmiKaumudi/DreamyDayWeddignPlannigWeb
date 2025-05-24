@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "D:\\ESOFT TOP UP\\PD\\DreamyDayWeddingPlanningWeb\\DreamyDayWeddingPlanningWeb\\DreamyDayWeddingPlanningWeb.csproj": {}
+    "C:\\Users\\User\\source\\repos\\New folder\\DreamyDayWeddingPlanningWeb\\DreamyDayWeddingPlanningWeb.csproj": {}
   },
   "projects": {
-    "D:\\ESOFT TOP UP\\PD\\DreamyDayWeddingPlanningWeb\\DreamyDayWeddingPlanningWeb\\DreamyDayWeddingPlanningWeb.csproj": {
+    "C:\\Users\\User\\source\\repos\\New folder\\DreamyDayWeddingPlanningWeb\\DreamyDayWeddingPlanningWeb.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\ESOFT TOP UP\\PD\\DreamyDayWeddingPlanningWeb\\DreamyDayWeddingPlanningWeb\\DreamyDayWeddingPlanningWeb.csproj",
+        "projectUniqueName": "C:\\Users\\User\\source\\repos\\New folder\\DreamyDayWeddingPlanningWeb\\DreamyDayWeddingPlanningWeb.csproj",
         "projectName": "DreamyDayWeddingPlanningWeb",
-        "projectPath": "D:\\ESOFT TOP UP\\PD\\DreamyDayWeddingPlanningWeb\\DreamyDayWeddingPlanningWeb\\DreamyDayWeddingPlanningWeb.csproj",
-        "packagesPath": "C:\\Users\\DELL\\.nuget\\packages\\",
-        "outputPath": "D:\\ESOFT TOP UP\\PD\\DreamyDayWeddingPlanningWeb\\DreamyDayWeddingPlanningWeb\\obj\\",
+        "projectPath": "C:\\Users\\User\\source\\repos\\New folder\\DreamyDayWeddingPlanningWeb\\DreamyDayWeddingPlanningWeb.csproj",
+        "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\User\\source\\repos\\New folder\\DreamyDayWeddingPlanningWeb\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\DELL\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -22,8 +26,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
-          "https://api.nuget.org/v3/index.json": {}
+          "https://www.nuget.org/api/v2/": {}
         },
         "frameworks": {
           "net8.0": {
@@ -40,7 +43,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.200"
       },
       "frameworks": {
         "net8.0": {
@@ -108,7 +112,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
